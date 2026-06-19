@@ -1,13 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface ContactFormProps {
   defaultSubject?: string;
 }
 
 export function ContactForm({ defaultSubject = '' }: ContactFormProps) {
+  const searchParams = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
+
+  const subjectFromUrl =
+    searchParams.get('subject') ??
+    (searchParams.get('product') ? `Enquiry: ${searchParams.get('product')}` : '');
+  const initialSubject = subjectFromUrl || defaultSubject;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,7 +61,7 @@ export function ContactForm({ defaultSubject = '' }: ContactFormProps) {
       </div>
       <div>
         <label className="mb-2 block text-sm text-muted">Subject *</label>
-        <input name="subject" required defaultValue={defaultSubject} className={inputClass} />
+        <input name="subject" required defaultValue={initialSubject} className={inputClass} />
       </div>
       <div>
         <label className="mb-2 block text-sm text-muted">Message *</label>

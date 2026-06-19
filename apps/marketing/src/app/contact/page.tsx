@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { HeroSection } from '@/components/hero-section';
 import { ContactForm } from '@/components/contact-form';
 import { ScrollReveal } from '@/components/scroll-reveal';
@@ -9,14 +10,8 @@ export const metadata: Metadata = {
   description: 'Contact ChaseHorse — letsconnect@chasehorse.com | +91 7337369111 | Bangalore, India',
 };
 
-export default async function ContactPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ subject?: string; product?: string }>;
-}) {
+export default function ContactPage() {
   const content = getSiteContent();
-  const params = await searchParams;
-  const subject = params.subject ?? (params.product ? `Enquiry: ${params.product}` : '');
 
   return (
     <>
@@ -31,7 +26,9 @@ export default async function ContactPage({
           <ScrollReveal>
             <h2 className="text-3xl font-medium text-foreground">Send a Message</h2>
             <div className="mt-8">
-              <ContactForm defaultSubject={subject} />
+              <Suspense fallback={<div className="h-64 animate-pulse rounded-sm bg-surface" />}>
+                <ContactForm />
+              </Suspense>
             </div>
           </ScrollReveal>
           <ScrollReveal delay={0.1}>

@@ -158,13 +158,27 @@ After seeding:
 
 ## Deployment
 
-```bash
-# Deploy API
-cd workers/api-gateway && pnpm wrangler deploy
+### Cloudflare Pages (marketing site)
 
-# Deploy Web (Cloudflare Pages)
-pnpm --filter @chasehorse/web build
+In your Cloudflare **Workers & Pages** build settings:
+
+| Setting | Value |
+|---|---|
+| **Build command** | `pnpm install --frozen-lockfile && pnpm build:marketing` |
+| **Deploy command** | `npx wrangler deploy --config apps/marketing/wrangler.toml` |
+
+> Do **not** run `npx wrangler deploy` from the repo root — this monorepo has multiple apps and Wrangler needs a project-specific config.
+
+### API worker
+
+```bash
+pnpm deploy:api
+# or: npx wrangler deploy --config workers/api-gateway/wrangler.toml
 ```
+
+### SaaS web app (separate Pages project)
+
+The dashboard app (`apps/web`) is not static-exported yet; deploy it as a separate Cloudflare Pages project when ready.
 
 GitHub Actions workflows handle CI and production deployment on push to `main`.
 

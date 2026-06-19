@@ -5,6 +5,9 @@
   "description": "ChaseHorse — Enterprise Logistics, Courier & Fleet Management Platform",
   "scripts": {
     "build": "turbo run build",
+    "build:marketing": "pnpm --filter @chasehorse/marketing build",
+    "deploy:marketing": "pnpm --filter @chasehorse/marketing deploy",
+    "deploy:api": "pnpm --filter @chasehorse/api-gateway deploy",
     "dev": "turbo run dev --filter=@chasehorse/marketing --filter=@chasehorse/web",
     "dev:web": "pnpm --filter @chasehorse/web dev",
     "dev:marketing": "pnpm --filter @chasehorse/marketing dev",
