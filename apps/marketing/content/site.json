@@ -1,0 +1,276 @@
+{
+  "home": {
+    "slug": "home",
+    "title": "ChaseHorse | Logistics & Supply Chain Solutions",
+    "description": "Growth Enabler Logiworkx Platform [GELP] — Human Interface + Technology + ESG-Sustainability + Market",
+    "heroImage": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920&q=80",
+    "sections": [
+      {
+        "type": "hero",
+        "title": "Chasehorse",
+        "subtitle": "Growth Enabler Logiworkx Platform [ GELP ]",
+        "body": "Human Interface + Technology + ESG-Sustainability + Market"
+      },
+      {
+        "type": "text",
+        "title": "Who We Are",
+        "body": "CHASEHORSE is a technology-driven logistics and supply chain transformation company delivering innovative solutions across industries globally. As a growth enabling partner, we orchestrated need-of-the-hour solutions engineered with futuristic capabilities. We pioneer a first-of-its-kind Logistics-as-a-Service (LaaS) Platform and beyond—offering a simplified, plug-and-play model equipped with pre-integrated, deployment-ready resources."
+      },
+      {
+        "type": "stats",
+        "title": "Why ChaseHorse G.E.L.P?",
+        "subtitle": "Value Creation . Futuristic . Practical . One Transparent Platform",
+        "stats": [
+          { "label": "Tier 1 Strategy Deployment", "value": "24h" },
+          { "label": "Tier 2 Operations Scale", "value": "48h" }
+        ],
+        "body": "The Growth Enabler Logiworkx Platform engineered a paradigm shift by delivering rapid business scalability coupled with immediately accessible plug & play resources. Backed by live market intelligence, flexible finance options, and highly feasible cost models."
+      }
+    ]
+  },
+  "contact": {
+    "slug": "contact",
+    "title": "Contact Us",
+    "description": "Get in touch with ChaseHorse logistics experts in Bangalore, India.",
+    "sections": [
+      {
+        "type": "text",
+        "title": "Contact us",
+        "body": "Contact us about anything related to our company or services. We typically respond within 1-2 business days."
+      },
+      {
+        "type": "faq",
+        "title": "Need help?",
+        "items": [
+          "What sets us apart? — Personalized solutions tailored to every customer.",
+          "How is your data secured? — Advanced encryption and security protocols.",
+          "What support do we offer? — Support through email and phone."
+        ]
+      }
+    ]
+  },
+  "jobs": {
+    "slug": "jobs",
+    "title": "Our Job Opportunities",
+    "description": "Join ChaseHorse — flexible gig-based logistics assignments across PAN India.",
+    "sections": [
+      {
+        "type": "text",
+        "title": "On-Field Logiworkx Lead",
+        "body": "We are inviting motivated professionals to collaborate with us on flexible, gig-based logistics assignments designed to fit around your schedule. This opportunity is ideal for individuals who value independence and want to take control of their working hours while contributing to real-world logistics operations. Each task provides hands-on experience in supply chain coordination, last-mile delivery operations, vendor interaction, and on-ground problem-solving. Performance-based earning model — Chasehorse, PAN INDIA."
+      }
+    ]
+  },
+  "services": [
+    { "slug": "digital-transformation", "title": "Digital Transformation", "description": "End-to-end digital transformation for logistics operations.", "tier": 1 },
+    { "slug": "ch-deploy", "title": "CH Deploy", "description": "DEPLOY – Onfield CX Lead deployment and field operations.", "tier": 1 },
+    { "slug": "8d-customer-complaints", "title": "8D Customer Complaints", "description": "Structured complaint management with Ewaybill, stakeholder collaboration, root cause analysis, and KPI tracking.", "tier": 1 },
+    { "slug": "merchandise-ppes", "title": "Merchandise & PPEs", "description": "On-site PPE outlet, HSE compliance checklist, and toolbox talks for safety operations.", "tier": 1 },
+    { "slug": "returns-management", "title": "Returns Management", "description": "Reverse logistics: sales returns, transit damages, quality rejections, pallets/lashing, packing material returns.", "tier": 1 },
+    { "slug": "digital-advancement", "title": "Digital Advancement", "description": "TMS Advanced, Data Science & ML, automations, generic AI, on-job tech training.", "tier": 2 },
+    { "slug": "optimization-tools", "title": "Optimization Tools", "description": "Freight optimization, route/lane rationalization, supplier integration, load/capacity, freight bill authentication.", "tier": 2 },
+    { "slug": "deploy-cdx-pro", "title": "DEPLOY – CDX Pro", "description": "On-field support: technical leads, incident support, training, stock taking, quality testing.", "tier": 2 },
+    { "slug": "fleet-driver-management", "title": "Fleet & Driver Management", "description": "Efficient use, maintenance, planning, and operational readiness of vehicles and drivers.", "tier": 2 },
+    { "slug": "esg-sustainability", "title": "ESG – Sustainability", "description": "Framework setup, basic ESG analytics, tracking methods, sustainability dashboard.", "tier": 2 },
+    { "slug": "customer-xperience-management", "title": "Customer Xperience Management", "description": "CHCX experience measurement, customized checklists, customer and vendor surveys.", "tier": 2 },
+    { "slug": "it-advanced-technologies", "title": "IT & Advanced Technologies", "description": "AI deployment, drone utilization, IoT & automations, data science & ML.", "tier": 3 },
+    { "slug": "operational-advancement", "title": "Operational Advancement", "description": "Advanced operational processes and continuous improvement frameworks.", "tier": 3 },
+    { "slug": "fleet-operations", "title": "Fleet Operations", "description": "Truck deployment, incident management, special express delivery, transhipment.", "tier": 3 },
+    { "slug": "scm-process", "title": "SCM & Process", "description": "Standardizing SCM, market reports, vendor sourcing, forecasting, procurement, storage, network design.", "tier": 3 },
+    { "slug": "sustainability-monitoring", "title": "Sustainability & Monitoring", "description": "Real-time sustainability monitoring and compliance tracking.", "tier": 3 },
+    { "slug": "compliance-governance", "title": "Compliance & Governance", "description": "Regulatory compliance, governance frameworks, and audit management.", "tier": 3 }
+  ],
+  "products": [
+    {
+      "slug": "ch-ghost",
+      "name": "CH Ghost",
+      "price": "₹ 599.00",
+      "description": "Premium ChaseHorse merchandise. Colors: blue, green, red, light pink. Sizes XS–XXL.",
+      "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80",
+      "colors": ["blue", "green", "red", "light pink"],
+      "sizes": ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+      "slug": "instinct",
+      "name": "Instinct",
+      "price": "₹ 499.00",
+      "description": "ChaseHorse Instinct collection. Colors: lavender, peach, cream, green.",
+      "image": "https://images.unsplash.com/photo-1583743814966-6a8c060a4d5f?w=600&q=80",
+      "colors": ["lavender", "peach", "cream", "green"],
+      "sizes": ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+      "slug": "chasehorse-logo",
+      "name": "ChaseHorse Logo",
+      "price": "₹ 499.00",
+      "description": "Official ChaseHorse logo merchandise.",
+      "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80",
+      "colors": ["blue", "black", "green", "red"],
+      "sizes": ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+      "slug": "dragon",
+      "name": "Dragon",
+      "price": "₹ 499.00",
+      "description": "Dragon collection ChaseHorse apparel.",
+      "image": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80",
+      "colors": ["blue", "black", "green", "red"],
+      "sizes": ["XS", "S", "M", "L", "XL", "XXL"]
+    }
+  ],
+  "courses": [
+    {
+      "slug": "warehouse-basics-training",
+      "title": "Warehouse Basics Training",
+      "description": "Foundational warehouse operations training covering inbound, sorting, storage, and outbound processes.",
+      "level": "Basic",
+      "image": "https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80"
+    }
+  ],
+  "pages": {
+    "fleet-driver-management": {
+      "slug": "fleet-driver-management",
+      "title": "Fleet & Driver Management",
+      "description": "Fleet & Driver Management — accessories, maintenance, planning & scheduling.",
+      "heroImage": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1920&q=80",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Fleet & Driver Management",
+          "subtitle": "CHASEHORSE ASSET OPTIMIZATION",
+          "body": "Fleet & Driver Management focuses on ensuring the efficient use, rigorous maintenance, precision planning, and absolute operational readiness of vehicles and drivers across all transportation operations."
+        },
+        {
+          "type": "modules",
+          "modules": [
+            { "number": "01", "title": "Accessories Driver/Trucks", "body": "Meticulously manages and monitors all vital vehicle-mounted equipment and auxiliary driver kits essential for secure, compliant road operations." },
+            { "number": "02", "title": "Maintenance", "body": "Governs vehicle lifecycle performance by transforming reactive repair cycles into an organized, proactive machine-readiness structure." },
+            { "number": "03", "title": "Planning & Scheduling", "body": "Coordinates structural fleet allocations, driving regulations, freight profiles, and time windows into highly efficient freight dispatch movements." }
+          ]
+        },
+        {
+          "type": "list",
+          "title": "Why Choose ChaseHorse Fleet & Driver Management?",
+          "items": [
+            "Brings driver safety accessories and asset checklists into a single compliance overview.",
+            "Scales machine dependability via rules-based predictive maintenance schedules.",
+            "Maximizes fleet optimization margins by balancing hours-of-service rules with dynamic route maps.",
+            "Cuts down line-haul logistics bottlenecks through unified capacity scheduling panels."
+          ]
+        }
+      ]
+    },
+    "8d-customer-complaints": {
+      "slug": "8d-customer-complaints",
+      "title": "8D Customer Complaints",
+      "description": "Structured complaint management with root cause analysis and KPI tracking.",
+      "heroImage": "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "8D Customer Complaints", "body": "Structured complaint management: Ewaybill, stakeholder collaboration, time-based closure, root cause analysis, CX linkage, KPI tracker." }]
+    },
+    "merchandise-ppes": {
+      "slug": "merchandise-ppes",
+      "title": "Merchandise & PPEs",
+      "description": "PPE and safety equipment management for logistics operations.",
+      "heroImage": "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Merchandise & PPEs", "body": "On-site PPE outlet, HSE compliance checklist, toolbox talks for operational safety." }]
+    },
+    "returns-management": {
+      "slug": "returns-management",
+      "title": "Returns Management",
+      "description": "Reverse logistics and returns processing.",
+      "heroImage": "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Returns Management", "body": "Sales returns, transit damages, quality rejections, pallets/lashing, packing material returns." }]
+    },
+    "digital-transformation": {
+      "slug": "digital-transformation",
+      "title": "Digital Transformation",
+      "description": "End-to-end digital transformation for logistics.",
+      "heroImage": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Digital Transformation", "body": "Transform your logistics operations with end-to-end digital capabilities, integrated systems, and deployment-ready technology stacks." }]
+    },
+    "ch-deploy": {
+      "slug": "ch-deploy",
+      "title": "CH Deploy",
+      "description": "DEPLOY – Onfield CX Lead deployment.",
+      "heroImage": "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "CH Deploy", "body": "DEPLOY – Onfield CX Lead: rapid field deployment, customer experience leadership, and on-ground operational excellence." }]
+    },
+    "digital-advancement": {
+      "slug": "digital-advancement",
+      "title": "Digital Advancement",
+      "description": "TMS, AI, ML, and automation for logistics.",
+      "heroImage": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Digital Advancement", "body": "TMS Advanced, Data Science & ML, automations, generic AI, on-job tech training." }]
+    },
+    "optimization-tools": {
+      "slug": "optimization-tools",
+      "title": "Optimization Tools",
+      "description": "Freight and route optimization tools.",
+      "heroImage": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=80&auto=format",
+      "sections": [{ "type": "text", "title": "Optimization Tools", "body": "Freight optimization, route/lane rationalization, supplier integration, load/capacity, freight bill authentication." }]
+    },
+    "deploy-cdx-pro": {
+      "slug": "deploy-cdx-pro",
+      "title": "DEPLOY – CDX Pro",
+      "description": "On-field technical support and quality testing.",
+      "heroImage": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "DEPLOY – CDX Pro", "body": "On-field support: technical leads, incident support, training, stock taking, quality testing." }]
+    },
+    "esg-sustainability": {
+      "slug": "esg-sustainability",
+      "title": "ESG – Sustainability",
+      "description": "ESG framework and sustainability analytics.",
+      "heroImage": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "ESG – Sustainability", "body": "Framework setup, basic ESG analytics, tracking methods, sustainability dashboard." }]
+    },
+    "customer-xperience-management": {
+      "slug": "customer-xperience-management",
+      "title": "Customer Xperience Management",
+      "description": "Customer experience measurement and surveys.",
+      "heroImage": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Customer Xperience Management", "body": "CHCX experience measurement, customized checklists, customer surveys, vendor surveys." }]
+    },
+    "it-advanced-technologies": {
+      "slug": "it-advanced-technologies",
+      "title": "IT & Advanced Technologies",
+      "description": "AI, drones, IoT for logistics.",
+      "heroImage": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "IT & Advanced Technologies", "body": "AI deployment, drone utilization, IoT & automations, data science & ML." }]
+    },
+    "operational-advancement": {
+      "slug": "operational-advancement",
+      "title": "Operational Advancement",
+      "description": "Advanced operational processes and improvement.",
+      "heroImage": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Operational Advancement", "body": "Advanced operational processes, continuous improvement frameworks, and scalable operations management." }]
+    },
+    "fleet-operations": {
+      "slug": "fleet-operations",
+      "title": "Fleet Operations",
+      "description": "Truck deployment and express delivery operations.",
+      "heroImage": "https://images.unsplash.com/photo-1519003722824-194b4459a99c?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Fleet Operations", "body": "Truck deployment, incident management, special express delivery, transhipment." }]
+    },
+    "scm-process": {
+      "slug": "scm-process",
+      "title": "SCM & Process",
+      "description": "Supply chain management and process standardization.",
+      "heroImage": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920&q=80&auto=format",
+      "sections": [{ "type": "text", "title": "SCM & Process", "body": "Standardizing SCM, market reports, vendor sourcing, forecasting, procurement, storage, network design." }]
+    },
+    "sustainability-monitoring": {
+      "slug": "sustainability-monitoring",
+      "title": "Sustainability & Monitoring",
+      "description": "Real-time sustainability monitoring.",
+      "heroImage": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Sustainability & Monitoring", "body": "Real-time sustainability monitoring, environmental compliance tracking, and ESG reporting." }]
+    },
+    "compliance-governance": {
+      "slug": "compliance-governance",
+      "title": "Compliance & Governance",
+      "description": "Regulatory compliance and governance frameworks.",
+      "heroImage": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80",
+      "sections": [{ "type": "text", "title": "Compliance & Governance", "body": "Regulatory compliance, governance frameworks, audit management, and policy adherence." }]
+    }
+  }
+}

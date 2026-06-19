@@ -1,0 +1,6 @@
+{
+  "name": "@chasehorse/integration-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Integration routes are served via @chasehorse/api-gateway at /api/integrations/*"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "@chasehorse/shipment-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shipment routes are served via @chasehorse/api-gateway at /api/shipments/*"
+}

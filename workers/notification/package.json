@@ -1,0 +1,6 @@
+{
+  "name": "@chasehorse/notification-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Notification queue consumer runs in @chasehorse/api-gateway"
+}

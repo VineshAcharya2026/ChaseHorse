@@ -1,0 +1,32 @@
+{
+  "name": "chasehorse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ChaseHorse — Enterprise Logistics, Courier & Fleet Management Platform",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@chasehorse/marketing --filter=@chasehorse/web",
+    "dev:web": "pnpm --filter @chasehorse/web dev",
+    "dev:marketing": "pnpm --filter @chasehorse/marketing dev",
+    "extract:odoo": "tsx scripts/extract-odoo-content.ts",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "db:generate": "pnpm --filter @chasehorse/database generate",
+    "db:migrate": "pnpm --filter @chasehorse/database migrate",
+    "db:seed": "pnpm --filter @chasehorse/database seed"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "cheerio": "^1.0.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=20"
+  }
+}

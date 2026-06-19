@@ -1,0 +1,28 @@
+{
+  "name": "@chasehorse/api-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo ok"
+  },
+  "dependencies": {
+    "@chasehorse/core": "workspace:*",
+    "@chasehorse/database": "workspace:*",
+    "@chasehorse/integrations-sdk": "workspace:*",
+    "@chasehorse/shared": "workspace:*",
+    "bcryptjs": "^2.4.3",
+    "drizzle-orm": "^0.38.1",
+    "hono": "^4.6.14",
+    "jose": "^5.9.6",
+    "otpauth": "^9.3.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.99.0"
+  }
+}

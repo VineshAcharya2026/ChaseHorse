@@ -1,0 +1,6 @@
+{
+  "name": "@chasehorse/webhook-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Webhook delivery runs via queue consumer in @chasehorse/api-gateway"
+}

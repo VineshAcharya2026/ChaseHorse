@@ -1,0 +1,57 @@
+name = "chasehorse-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+FRONTEND_URL = "http://localhost:3000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "chasehorse-db"
+database_id = "local-dev-db"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "local-dev-cache"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "chasehorse-storage"
+
+[[queues.producers]]
+binding = "NOTIFICATION_QUEUE"
+queue = "chasehorse-notifications"
+
+[[queues.producers]]
+binding = "WEBHOOK_QUEUE"
+queue = "chasehorse-webhooks"
+
+[[queues.producers]]
+binding = "AUDIT_QUEUE"
+queue = "chasehorse-audit"
+
+[[queues.consumers]]
+queue = "chasehorse-notifications"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[queues.consumers]]
+queue = "chasehorse-webhooks"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[queues.consumers]]
+queue = "chasehorse-audit"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[durable_objects]
+bindings = [{ name = "TRACKING", class_name = "TrackingRoom" }]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["TrackingRoom"]
+
+[dev]
+port = 8787

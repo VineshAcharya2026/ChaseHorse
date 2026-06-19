@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 23 23 23;
+    --muted: 115 115 115;
+    --border: 229 229 229;
+    --surface: 245 245 245;
+    --header-bg: 255 255 255;
+    --header-fg: 23 23 23;
+    --card-bg: 255 255 255;
+    --btn-primary-bg: 23 23 23;
+    --btn-primary-fg: 255 255 255;
+    --btn-secondary-border: 23 23 23;
+  }
+
+  .dark {
+    --background: 0 0 0;
+    --foreground: 255 255 255;
+    --muted: 163 163 163;
+    --border: 38 38 38;
+    --surface: 10 10 10;
+    --header-bg: 0 0 0;
+    --header-fg: 255 255 255;
+    --card-bg: 10 10 10;
+    --btn-primary-bg: 255 255 255;
+    --btn-primary-fg: 0 0 0;
+    --btn-secondary-border: 255 255 255;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

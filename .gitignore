@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build
+dist
+.next
+.turbo
+.open-next
+.vercel
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cloudflare
+.wrangler
+.dev.vars
+
+# Test
+coverage
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+*.tsbuildinfo
