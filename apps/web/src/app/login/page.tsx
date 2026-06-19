@@ -105,6 +105,8 @@ export default function LoginPage() {
 
             <p className="mt-4 text-center text-xs text-muted-foreground">
               Demo: superadmin@chasehorse.com / Password123!
+              <br />
+              API: {process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8787'}
             </p>
           </CardContent>
         </Card>

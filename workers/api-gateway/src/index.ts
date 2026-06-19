@@ -24,12 +24,31 @@ import {
 } from './routes/integrations';
 import { trackingRouter } from './routes/tracking';
 import { rateLimitMiddleware } from './middleware/auth';
-import { seedDatabase } from '@chasehorse/database';
+import { createDb, seedDatabase, users } from '@chasehorse/database';
 import type { Env } from './types';
 
 export { TrackingRoom } from './durable-objects/tracking';
 
 const app = new Hono<{ Bindings: Env }>();
+
+let devSeedChecked = false;
+
+app.use('*', async (c, next) => {
+  if (!devSeedChecked && c.env.JWT_SECRET.startsWith('dev-')) {
+    devSeedChecked = true;
+    try {
+      const db = createDb(c.env.DB);
+      const existing = await db.select().from(users).limit(1).get();
+      if (!existing) {
+        await seedDatabase(c.env.DB);
+        console.log('Dev database auto-seeded with demo users');
+      }
+    } catch (err) {
+      console.error('Dev database seed check failed:', err);
+    }
+  }
+  await next();
+});
 
 app.use(
   '*',

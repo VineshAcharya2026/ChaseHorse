@@ -8,7 +8,10 @@
     "build:marketing": "pnpm --filter @chasehorse/marketing build",
     "deploy:marketing": "pnpm --filter @chasehorse/marketing deploy:cf",
     "deploy:api": "pnpm --filter @chasehorse/api-gateway deploy",
-    "dev": "turbo run dev --filter=@chasehorse/marketing --filter=@chasehorse/web",
+    "dev": "turbo run dev --filter=@chasehorse/api-gateway --filter=@chasehorse/marketing --filter=@chasehorse/web",
+    "dev:api": "pnpm --filter @chasehorse/api-gateway dev",
+    "db:setup": "pnpm --filter @chasehorse/api-gateway exec wrangler d1 execute chasehorse-db --local --file=../../packages/database/drizzle/0000_init.sql",
+    "db:seed": "node scripts/seed-local-api.mjs",
     "dev:web": "pnpm --filter @chasehorse/web dev",
     "dev:marketing": "pnpm --filter @chasehorse/marketing dev",
     "extract:odoo": "tsx scripts/extract-odoo-content.ts",
@@ -17,8 +20,7 @@
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "db:generate": "pnpm --filter @chasehorse/database generate",
-    "db:migrate": "pnpm --filter @chasehorse/database migrate",
-    "db:seed": "pnpm --filter @chasehorse/database seed"
+    "db:migrate": "pnpm --filter @chasehorse/database migrate"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

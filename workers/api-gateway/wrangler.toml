@@ -9,11 +9,12 @@ FRONTEND_URL = "http://localhost:3000"
 [[d1_databases]]
 binding = "DB"
 database_name = "chasehorse-db"
-database_id = "local-dev-db"
+database_id = "f21fe86b-82b9-4f58-804a-c9616624b3d5"
 
 [[kv_namespaces]]
 binding = "CACHE"
-id = "local-dev-cache"
+id = "56c784c8528a49278f26e131c0b0d975"
+preview_id = "1c973c3b8b024516b15ff4a5b5eb505f"
 
 [[r2_buckets]]
 binding = "STORAGE"
@@ -51,7 +52,7 @@ bindings = [{ name = "TRACKING", class_name = "TrackingRoom" }]
 
 [[migrations]]
 tag = "v1"
-new_classes = ["TrackingRoom"]
+new_sqlite_classes = ["TrackingRoom"]
 
 [dev]
 port = 8787

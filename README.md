@@ -97,15 +97,24 @@ curl -X POST http://localhost:8787/admin/seed
 ### Development
 
 ```bash
-# Terminal 1 — API
-pnpm --filter @chasehorse/api-gateway dev
+# One-time: create local database tables
+pnpm db:setup
 
-# Terminal 2 — Web
-pnpm --filter @chasehorse/web dev
+# Start API + web + marketing (3 services)
+pnpm dev
+
+# Or start individually:
+pnpm dev:api        # API on http://localhost:8787
+pnpm dev:web        # Dashboard on http://localhost:3000
+pnpm dev:marketing  # Marketing site on http://localhost:3001
 ```
 
-- Web: http://localhost:3000
-- API: http://localhost:8787
+On first API start in dev, demo users are **auto-seeded** if the database is empty.
+
+If login fails with "Cannot reach API", ensure `pnpm dev:api` is running and you've run `pnpm db:setup` once.
+
+**Production API:** `https://chasehorse-api.vineshjm.workers.dev`  
+Set `NEXT_PUBLIC_API_URL` in `apps/web/.env.local` to point at your API URL.
 
 ### Demo Credentials
 

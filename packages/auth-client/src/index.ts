@@ -46,7 +46,15 @@ export class ApiClient {
     };
     if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
 
-    const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+    let res: Response;
+    try {
+      res = await fetch(`${API_URL}${path}`, { ...options, headers });
+    } catch {
+      throw new Error(
+        `Cannot reach API at ${API_URL}. Start the backend with "pnpm dev:api", then run "pnpm db:setup" and "pnpm db:seed".`,
+      );
+    }
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.error ?? 'Request failed');
     return data;
