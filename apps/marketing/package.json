@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
-    "deploy": "wrangler deploy",
+    "deploy:cf": "wrangler pages deploy out --project-name=chasehorse-marketing",
     "start": "next start --port 3001",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

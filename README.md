@@ -165,7 +165,7 @@ In your Cloudflare **Workers & Pages** build settings:
 | Setting | Value |
 |---|---|
 | **Build command** | `pnpm install --frozen-lockfile && pnpm build:marketing` |
-| **Deploy command** | `npx wrangler deploy --config apps/marketing/wrangler.toml` |
+| **Deploy command** | `npx wrangler pages deploy apps/marketing/out --project-name=chasehorse-marketing` |
 
 > Do **not** run `npx wrangler deploy` from the repo root — this monorepo has multiple apps and Wrangler needs a project-specific config.
 

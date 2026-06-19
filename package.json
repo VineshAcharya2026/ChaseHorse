@@ -6,7 +6,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:marketing": "pnpm --filter @chasehorse/marketing build",
-    "deploy:marketing": "pnpm --filter @chasehorse/marketing deploy",
+    "deploy:marketing": "pnpm --filter @chasehorse/marketing deploy:cf",
     "deploy:api": "pnpm --filter @chasehorse/api-gateway deploy",
     "dev": "turbo run dev --filter=@chasehorse/marketing --filter=@chasehorse/web",
     "dev:web": "pnpm --filter @chasehorse/web dev",
