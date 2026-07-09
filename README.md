@@ -33,8 +33,12 @@ chasehorse/
 
 ## Marketing Site
 
-**Marketing website (Tesla-style):** http://localhost:3001  
-**SaaS dashboards:** http://localhost:3000
+**Local:** http://localhost:3001 (marketing) · http://localhost:3000 (SaaS app)
+
+**Production:**
+- Marketing: https://chasehorse-marketing-8ic.pages.dev
+- Web app: https://chasehorse-app.pages.dev
+- API: https://chasehorse-api.vineshjm.workers.dev
 
 ```bash
 # Start both sites
@@ -70,11 +74,14 @@ pnpm install
 
 ### Environment
 
-Copy `.env.example` to `apps/web/.env.local`:
+For local development, copy `.env.example` to `apps/web/.env.development.local`:
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8787
+NEXT_PUBLIC_MAPS_API_KEY=your-google-maps-key
 ```
+
+Production builds use `apps/web/.env.production` (already configured for Cloudflare Pages).
 
 For the API worker, create `workers/api-gateway/.dev.vars`:
 
@@ -82,16 +89,34 @@ For the API worker, create `workers/api-gateway/.dev.vars`:
 JWT_SECRET=your-jwt-secret-min-32-chars-long!!
 JWT_REFRESH_SECRET=your-refresh-secret-min-32!!
 FRONTEND_URL=http://localhost:3000
+AWB_PREFIX=CH
 ```
+
+### Production secrets (Cloudflare Worker)
+
+Set via `wrangler secret put` in `workers/api-gateway`:
+
+| Secret | Purpose |
+|--------|---------|
+| `JWT_SECRET` | Access token signing |
+| `JWT_REFRESH_SECRET` | Refresh token signing |
+| `SEED_SECRET` | Protects `POST /admin/seed` |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth |
+| `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` | OAuth |
+| `SENDGRID_API_KEY` | Email notifications |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` | SMS OTP |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` | Payments |
+| `ZOHO_CLIENT_ID` / `ZOHO_CLIENT_SECRET` | CRM sync |
+
+GitHub Actions also requires `SEED_SECRET` for automated database seeding.
 
 ### Database Setup
 
 ```bash
-cd workers/api-gateway
-pnpm wrangler d1 execute chasehorse-db --local --file=../../packages/database/drizzle/0000_init.sql
-pnpm wrangler dev
-# In another terminal, seed the database:
-curl -X POST http://localhost:8787/admin/seed
+pnpm db:setup              # Local D1 tables
+pnpm db:seed               # Local seed via API
+pnpm db:migrate:remote     # Production D1 migration
+pnpm db:seed:remote        # Production seed (requires SEED_SECRET env)
 ```
 
 ### Development
@@ -163,33 +188,38 @@ After seeding:
 | `POST /api/billing/invoices` | Generate invoice |
 | `GET /api/analytics/super-admin` | Platform analytics |
 | `GET /api/v1/shipments` | REST API (API key auth) |
-| `POST /graphql` | GraphQL (enterprise) |
+| `GET /openapi.json` | OpenAPI spec |
+| `POST /webhooks/razorpay` | Razorpay payment webhook |
+| `POST /api/uploads` | R2 file upload |
 
 ## Deployment
 
-### Cloudflare Pages (marketing site)
+Deploy everything from the repo root:
 
-In your Cloudflare **Workers & Pages** build settings:
+```bash
+pnpm deploy:production   # API + marketing + web app
+```
 
-| Setting | Value |
-|---|---|
-| **Build command** | `pnpm install --frozen-lockfile && pnpm build:marketing` |
-| **Deploy command** | `npx wrangler pages deploy apps/marketing/out --project-name=chasehorse-marketing` |
-
-> Do **not** run `npx wrangler deploy` from the repo root — this monorepo has multiple apps and Wrangler needs a project-specific config.
-
-### API worker
+Or individually:
 
 ```bash
 pnpm deploy:api
-# or: npx wrangler deploy --config workers/api-gateway/wrangler.toml
+pnpm deploy:marketing
+pnpm deploy:web
 ```
 
-### SaaS web app (separate Pages project)
+### Cloudflare Pages
 
-The dashboard app (`apps/web`) is not static-exported yet; deploy it as a separate Cloudflare Pages project when ready.
+| App | Project name | Build output |
+|---|---|---|
+| Marketing | `chasehorse-marketing` | `apps/marketing/out` |
+| Web app | `chasehorse-app` | `apps/web/out` |
 
-GitHub Actions workflows handle CI and production deployment on push to `main`.
+> Do **not** run `npx wrangler deploy` from the repo root — use the `deploy:*` scripts above.
+
+GitHub Actions deploys API, marketing, and web on push to `main` (requires `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `SEED_SECRET` secrets).
+
+See [docs/HANDOFF.md](docs/HANDOFF.md) for the full dev team handoff and production checklist.
 
 ## License
 

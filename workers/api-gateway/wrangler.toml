@@ -2,50 +2,51 @@ name = "chasehorse-api"
 main = "src/index.ts"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
+account_id = "595b417e972522c4dde209e3d11d0c9f"
 
 [vars]
-FRONTEND_URL = "http://localhost:3000"
+FRONTEND_URL = "https://chasehorse-app-cmm.pages.dev"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "chasehorse-db"
-database_id = "f21fe86b-82b9-4f58-804a-c9616624b3d5"
+database_id = "42bd8654-a2dd-486a-8dd6-2aff2ba1785b"
 
 [[kv_namespaces]]
 binding = "CACHE"
-id = "56c784c8528a49278f26e131c0b0d975"
-preview_id = "1c973c3b8b024516b15ff4a5b5eb505f"
+id = "3fe761276dee4386ba37e8cd97b3d7b2"
 
 [[r2_buckets]]
 binding = "STORAGE"
 bucket_name = "chasehorse-storage"
 
-[[queues.producers]]
-binding = "NOTIFICATION_QUEUE"
-queue = "chasehorse-notifications"
+# Queues - enable Queues in Cloudflare dashboard then uncomment
+# [[queues.producers]]
+# binding = "NOTIFICATION_QUEUE"
+# queue = "chasehorse-notifications"
 
-[[queues.producers]]
-binding = "WEBHOOK_QUEUE"
-queue = "chasehorse-webhooks"
+# [[queues.producers]]
+# binding = "WEBHOOK_QUEUE"
+# queue = "chasehorse-webhooks"
 
-[[queues.producers]]
-binding = "AUDIT_QUEUE"
-queue = "chasehorse-audit"
+# [[queues.producers]]
+# binding = "AUDIT_QUEUE"
+# queue = "chasehorse-audit"
 
-[[queues.consumers]]
-queue = "chasehorse-notifications"
-max_batch_size = 10
-max_batch_timeout = 30
+# [[queues.consumers]]
+# queue = "chasehorse-notifications"
+# max_batch_size = 10
+# max_batch_timeout = 30
 
-[[queues.consumers]]
-queue = "chasehorse-webhooks"
-max_batch_size = 10
-max_batch_timeout = 30
+# [[queues.consumers]]
+# queue = "chasehorse-webhooks"
+# max_batch_size = 10
+# max_batch_timeout = 30
 
-[[queues.consumers]]
-queue = "chasehorse-audit"
-max_batch_size = 10
-max_batch_timeout = 30
+# [[queues.consumers]]
+# queue = "chasehorse-audit"
+# max_batch_size = 10
+# max_batch_timeout = 30
 
 [durable_objects]
 bindings = [{ name = "TRACKING", class_name = "TrackingRoom" }]

@@ -1,15 +1,22 @@
 import Link from 'next/link';
 import { APP_NAME, APP_TAGLINE } from '@chasehorse/shared';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { ArrowRight, Package, Truck, BarChart3, Shield } from 'lucide-react';
+
+const MARKETING_URL = process.env.NEXT_PUBLIC_MARKETING_URL ?? 'https://chasehorse-marketing-8ic.pages.dev';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-white/10">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <span className="text-xl font-semibold tracking-tight">{APP_NAME}</span>
-          <div className="flex items-center gap-4">
+      <header className="border-b border-border">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+          <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <a href={MARKETING_URL} className="text-sm text-muted-foreground hover:text-foreground">
+              Website
+            </a>
             <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground">
               Sign in
             </Link>
@@ -20,8 +27,8 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 py-24 text-center">
-        <h1 className="text-5xl font-semibold tracking-tight sm:text-6xl">
+      <section className="mx-auto max-w-6xl px-6 py-16 text-center">
+        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
           {APP_TAGLINE}
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
@@ -35,7 +42,7 @@ export default function HomePage() {
             </Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/track/demo">Track a Parcel</Link>
+            <Link href="/track?awb=demo">Track a Parcel</Link>
           </Button>
         </div>
       </section>
@@ -47,7 +54,7 @@ export default function HomePage() {
           { icon: BarChart3, title: 'Analytics', desc: 'Enterprise-grade dashboards and reporting' },
           { icon: Shield, title: 'Enterprise Security', desc: 'RBAC, MFA, audit logs, and compliance ready' },
         ].map((feature) => (
-          <div key={feature.title} className="rounded-xl border border-white/10 p-6">
+          <div key={feature.title} className="rounded-xl border border-border p-6">
             <feature.icon className="h-8 w-8 text-primary" />
             <h3 className="mt-4 font-semibold">{feature.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{feature.desc}</p>

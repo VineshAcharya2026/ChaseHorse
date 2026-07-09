@@ -49,7 +49,7 @@ function ApiKeysContent() {
         </div>
       )}
       {(data?.data ?? []).map((key) => (
-        <div key={key.id as string} className="mb-2 rounded-lg border border-white/10 p-4 flex justify-between">
+        <div key={key.id as string} className="mb-2 rounded-lg border border-border p-4 flex justify-between">
           <div>
             <p className="font-medium">{key.name as string}</p>
             <p className="text-sm text-muted-foreground">{key.keyPrefix as string}...</p>

@@ -5,8 +5,9 @@ import type { JwtPayload, UserRole } from '@chasehorse/shared';
 interface AuthState {
   user: JwtPayload | null;
   accessToken: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
-  setAuth: (user: JwtPayload, token: string) => void;
+  setAuth: (user: JwtPayload, token: string, refreshToken?: string | null) => void;
   clearAuth: () => void;
   hasRole: (roles: UserRole[]) => boolean;
 }
@@ -16,9 +17,12 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       accessToken: null,
+      refreshToken: null,
       isAuthenticated: false,
-      setAuth: (user, token) => set({ user, accessToken: token, isAuthenticated: true }),
-      clearAuth: () => set({ user: null, accessToken: null, isAuthenticated: false }),
+      setAuth: (user, token, refreshToken = null) =>
+        set({ user, accessToken: token, refreshToken, isAuthenticated: true }),
+      clearAuth: () =>
+        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
       hasRole: (roles) => {
         const { user } = get();
         return user ? roles.includes(user.role) : false;
@@ -91,6 +95,20 @@ export async function login(email: string, password: string) {
   return res.data;
 }
 
+export async function refreshSession() {
+  const { refreshToken, setAuth, clearAuth } = useAuthStore.getState();
+  if (!refreshToken) throw new Error('No refresh token');
+
+  const res = await api.post<{
+    success: boolean;
+    data: { user: JwtPayload; accessToken: string; refreshToken: string };
+  }>('/api/auth/refresh', { refreshToken });
+
+  api.setToken(res.data.accessToken);
+  setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+  return res.data;
+}
+
 export async function register(data: { email: string; password: string; name: string; phone?: string }) {
   const res = await api.post<{
     success: boolean;
@@ -100,7 +118,14 @@ export async function register(data: { email: string; password: string; name: st
 }
 
 export async function logout() {
-  await api.post('/api/auth/logout', {});
+  const { refreshToken, clearAuth } = useAuthStore.getState();
+  try {
+    await api.post('/api/auth/logout', { refreshToken });
+  } catch {
+    // ignore
+  }
+  clearAuth();
+  api.setToken(null);
 }
 
 export async function requestOtp(phone: string) {

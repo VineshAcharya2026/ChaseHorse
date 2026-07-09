@@ -24,9 +24,11 @@ import {
   Workflow,
   Menu,
   X,
+  Palette,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useAuthStore } from '@chasehorse/auth-client';
+import { useAuthStore, logout } from '@chasehorse/auth-client';
+import { ThemeToggle } from '@/components/theme-toggle';
 import type { UserRole } from '@chasehorse/shared';
 
 interface NavItem {
@@ -46,6 +48,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { label: 'Billing', href: '/admin/billing', icon: CreditCard },
     { label: 'Integrations', href: '/admin/integrations', icon: Plug },
+    { label: 'Website CMS', href: '/admin/cms', icon: Palette },
     { label: 'Audit Logs', href: '/admin/audit', icon: FileText },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
   ],
@@ -84,6 +87,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { label: 'Dashboard', href: '/enterprise', icon: LayoutDashboard },
     { label: 'Bulk Upload', href: '/enterprise/bulk', icon: Package },
     { label: 'API Keys', href: '/enterprise/api-keys', icon: Key },
+    { label: 'Webhooks', href: '/enterprise/webhooks', icon: Plug },
     { label: 'Team', href: '/enterprise/team', icon: Users },
     { label: 'Reports', href: '/enterprise/reports', icon: BarChart3 },
     { label: 'Workflows', href: '/enterprise/workflows', icon: Workflow },
@@ -98,7 +102,7 @@ export function DashboardShell({
   role: UserRole;
 }) {
   const pathname = usePathname();
-  const { clearAuth, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navItems = NAV_CONFIG[role] ?? [];
 
@@ -106,14 +110,15 @@ export function DashboardShell({
     <div className="flex min-h-screen bg-background">
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 glass transform transition-transform lg:translate-x-0 lg:static',
+          'fixed inset-y-0 left-0 z-50 w-56 glass transform transition-transform lg:translate-x-0 lg:static',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="flex h-16 items-center px-6 border-b border-white/10">
+        <div className="flex h-16 items-center justify-between border-b border-border px-6">
           <Link href="/" className="text-lg font-semibold tracking-tight">
             {APP_NAME}
           </Link>
+          <ThemeToggle />
         </div>
         <nav className="flex flex-col gap-1 p-4">
           {navItems.map((item) => {
@@ -126,7 +131,7 @@ export function DashboardShell({
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                  active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
+                  active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground',
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -135,14 +140,14 @@ export function DashboardShell({
             );
           })}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 p-4">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
           <p className="mb-2 truncate text-xs text-muted-foreground">{user?.email}</p>
           <button
             onClick={() => {
-              clearAuth();
+              logout();
               window.location.href = '/login';
             }}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted/40 hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />
             Sign out
@@ -155,13 +160,16 @@ export function DashboardShell({
       )}
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center gap-4 border-b border-white/10 px-6 lg:hidden">
-          <button onClick={() => setMobileOpen(true)}>
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-          <span className="font-semibold">{APP_NAME}</span>
+        <header className="flex h-16 items-center justify-between gap-4 border-b border-border px-6 lg:hidden">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setMobileOpen(true)}>
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            <span className="font-semibold">{APP_NAME}</span>
+          </div>
+          <ThemeToggle />
         </header>
-        <main className="flex-1 p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
     </div>
   );

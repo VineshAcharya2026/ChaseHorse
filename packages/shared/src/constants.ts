@@ -56,10 +56,19 @@ export const WEBHOOK_EVENTS = [
   'invoice.generated',
 ] as const;
 
+export const VEHICLE_TYPES = {
+  bike: { label: 'Bike', maxPayloadKg: 10, maxVolumeM3: 0.05 },
+  auto: { label: 'Auto', maxPayloadKg: 50, maxVolumeM3: 0.2 },
+  mini_truck: { label: 'Mini Truck', maxPayloadKg: 750, maxVolumeM3: 4 },
+  large_truck: { label: 'Large Truck', maxPayloadKg: 5000, maxVolumeM3: 30 },
+  van: { label: 'Van', maxPayloadKg: 1000, maxVolumeM3: 8 },
+} as const;
+
 export const INTEGRATION_PROVIDERS = [
   'salesforce',
   'hubspot',
   'zoho',
+  'custom_webhook',
   'dynamics365',
   'sap',
   'netsuite',

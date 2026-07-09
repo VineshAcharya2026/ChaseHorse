@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import * as OTPAuth from 'otpauth';
 import { createDb, users, refreshTokens, userCompanyRoles } from '@chasehorse/database';
 import {
@@ -9,7 +9,11 @@ import {
   hashPassword,
   generateId,
   hashToken,
+  verifyToken,
 } from '../lib/auth';
+import { exchangeOAuthCode } from '../lib/oauth';
+import { sendSms } from '../lib/notifications';
+import { audit } from '../lib/audit-helper';
 import { authMiddleware } from '../middleware/auth';
 import type { Env, Variables } from '../types';
 
@@ -34,16 +38,26 @@ auth.post('/register', async (c) => {
     role: 'customer',
   });
 
+  await audit(c, 'register', 'user', userId, undefined, userId);
+
   const accessToken = await signAccessToken(
     { sub: userId, email: body.email, role: 'customer', companyId: null, branchId: null },
     c.env.JWT_SECRET,
   );
+  const refreshToken = await signRefreshToken(userId, c.env.JWT_REFRESH_SECRET);
+  await db.insert(refreshTokens).values({
+    id: generateId(),
+    userId,
+    tokenHash: await hashToken(refreshToken),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  });
 
   return c.json({
     success: true,
     data: {
       user: { sub: userId, email: body.email, role: 'customer' },
       accessToken,
+      refreshToken,
     },
   });
 });
@@ -93,6 +107,8 @@ auth.post('/login', async (c) => {
     })
     .where(eq(users.id, user.id));
 
+  await audit(c, 'login', 'user', user.id, undefined, user.id);
+
   return c.json({
     success: true,
     data: {
@@ -110,13 +126,98 @@ auth.post('/login', async (c) => {
 });
 
 auth.post('/logout', authMiddleware, async (c) => {
+  let refreshToken: string | undefined;
+  try {
+    const body = await c.req.json<{ refreshToken?: string }>();
+    refreshToken = body.refreshToken;
+  } catch {
+    refreshToken = undefined;
+  }
+  const db = createDb(c.env.DB);
+  if (refreshToken) {
+    const tokenHash = await hashToken(refreshToken);
+    await db.delete(refreshTokens).where(eq(refreshTokens.tokenHash, tokenHash));
+  } else {
+    await db.delete(refreshTokens).where(eq(refreshTokens.userId, c.get('userId')));
+  }
+  await audit(c, 'logout', 'user', c.get('userId'));
   return c.json({ success: true, message: 'Logged out' });
+});
+
+auth.post('/refresh', async (c) => {
+  const { refreshToken } = await c.req.json<{ refreshToken: string }>();
+  if (!refreshToken) return c.json({ success: false, error: 'Refresh token required' }, 400);
+
+  let payload: { sub: string };
+  try {
+    payload = (await verifyToken(refreshToken, c.env.JWT_REFRESH_SECRET)) as { sub: string };
+  } catch {
+    return c.json({ success: false, error: 'Invalid refresh token' }, 401);
+  }
+
+  const db = createDb(c.env.DB);
+  const tokenHash = await hashToken(refreshToken);
+  const stored = await db
+    .select()
+    .from(refreshTokens)
+    .where(and(eq(refreshTokens.userId, payload.sub), eq(refreshTokens.tokenHash, tokenHash)))
+    .get();
+
+  if (!stored) {
+    return c.json({ success: false, error: 'Invalid refresh token' }, 401);
+  }
+
+  const user = await db.select().from(users).where(eq(users.id, payload.sub)).get();
+  if (!user) return c.json({ success: false, error: 'User not found' }, 404);
+
+  const roleRecord = await db
+    .select()
+    .from(userCompanyRoles)
+    .where(eq(userCompanyRoles.userId, user.id))
+    .get();
+
+  const accessToken = await signAccessToken(
+    {
+      sub: user.id,
+      email: user.email,
+      role: user.role as 'customer',
+      companyId: roleRecord?.companyId ?? null,
+      branchId: roleRecord?.branchId ?? null,
+    },
+    c.env.JWT_SECRET,
+  );
+
+  const newRefreshToken = await signRefreshToken(user.id, c.env.JWT_REFRESH_SECRET);
+  await db
+    .update(refreshTokens)
+    .set({
+      tokenHash: await hashToken(newRefreshToken),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    })
+    .where(eq(refreshTokens.id, stored.id));
+
+  return c.json({
+    success: true,
+    data: {
+      user: {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        companyId: roleRecord?.companyId ?? null,
+        branchId: roleRecord?.branchId ?? null,
+      },
+      accessToken,
+      refreshToken: newRefreshToken,
+    },
+  });
 });
 
 auth.post('/otp/request', async (c) => {
   const { phone } = await c.req.json<{ phone: string }>();
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  await c.env.CACHE.put(`otp:${phone}`, otp, { expirationTtl: 300 });
+  await c.env.CACHE.put(`otp:${phone}`, otp, { expirationTtl: 600 });
+  await sendSms(c.env, phone, `ChaseHorse OTP: ${otp}. Valid 10 min.`);
+  await c.env.NOTIFICATION_QUEUE?.send({ event: 'otp', phone, otp });
   return c.json({ success: true, message: 'OTP sent', data: { phone } });
 });
 
@@ -245,34 +346,77 @@ auth.post('/oauth/:provider/callback', async (c) => {
   if (storedProvider !== provider) {
     return c.json({ success: false, error: 'Invalid state' }, 400);
   }
+  await c.env.CACHE.delete(`oauth:state:${state}`);
 
   const db = createDb(c.env.DB);
-  const userId = generateId();
-  const email = `${provider}_user@oauth.chasehorse.com`;
+  let profile;
+  try {
+    profile = await exchangeOAuthCode(provider, code, c.env);
+  } catch (err) {
+    return c.json({ success: false, error: err instanceof Error ? err.message : 'OAuth failed' }, 400);
+  }
 
-  let user = await db.select().from(users).where(eq(users.oauthProvider, provider)).get();
+  let user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, profile.email))
+    .get();
+
   if (!user) {
+    const userId = generateId();
     await db.insert(users).values({
       id: userId,
-      email,
-      name: `${provider} User`,
+      email: profile.email,
+      name: profile.name,
       role: 'customer',
       oauthProvider: provider,
-      oauthId: code.slice(0, 20),
+      oauthId: profile.providerId,
     });
     user = await db.select().from(users).where(eq(users.id, userId)).get();
   }
 
   if (!user) return c.json({ success: false, error: 'OAuth failed' }, 500);
 
+  const roleRecord = await db
+    .select()
+    .from(userCompanyRoles)
+    .where(eq(userCompanyRoles.userId, user.id))
+    .get();
+
   const accessToken = await signAccessToken(
-    { sub: user.id, email: user.email, role: user.role as 'customer', companyId: null, branchId: null },
+    {
+      sub: user.id,
+      email: user.email,
+      role: user.role as 'customer',
+      companyId: roleRecord?.companyId ?? null,
+      branchId: roleRecord?.branchId ?? null,
+    },
     c.env.JWT_SECRET,
   );
 
+  const refreshToken = await signRefreshToken(user.id, c.env.JWT_REFRESH_SECRET);
+  await db.insert(refreshTokens).values({
+    id: generateId(),
+    userId: user.id,
+    tokenHash: await hashToken(refreshToken),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  });
+
+  await audit(c, 'oauth_login', 'user', user.id, { provider }, user.id);
+
   return c.json({
     success: true,
-    data: { user: { sub: user.id, email: user.email, role: user.role }, accessToken },
+    data: {
+      user: {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        companyId: roleRecord?.companyId ?? null,
+        branchId: roleRecord?.branchId ?? null,
+      },
+      accessToken,
+      refreshToken,
+    },
   });
 });
 

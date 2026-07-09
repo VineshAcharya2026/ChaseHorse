@@ -13,7 +13,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { APP_NAME, APP_TAGLINE } from '@chasehorse/shared';
+import { ThemeToggle } from '@/components/theme-toggle';
 import type { UserRole } from '@chasehorse/shared';
+
+const isLocalDev =
+  typeof window !== 'undefined'
+    ? window.location.hostname === 'localhost'
+    : process.env.NODE_ENV === 'development';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,7 +38,7 @@ export default function LoginPage() {
     try {
       const result = await login(data.email, data.password);
       api.setToken(result.accessToken);
-      setAuth(result.user, result.accessToken);
+      setAuth(result.user, result.accessToken, result.refreshToken);
       const route = ROLE_ROUTES[result.user.role as UserRole] ?? '/portal';
       router.push(route);
     } catch (err) {
@@ -43,14 +49,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
+    <div className="relative flex min-h-screen items-center justify-center p-6">
+      <div className="absolute right-6 top-6">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="text-2xl font-semibold tracking-tight">{APP_NAME}</Link>
           <p className="mt-2 text-sm text-muted-foreground">{APP_TAGLINE}</p>
         </div>
 
-        <Card className="border-white/10">
+        <Card className="border-border">
           <CardHeader>
             <CardTitle>Sign in</CardTitle>
             <CardDescription>Enter your credentials to access your dashboard</CardDescription>
@@ -103,11 +112,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <p className="mt-4 text-center text-xs text-muted-foreground">
-              Demo: superadmin@chasehorse.com / Password123!
-              <br />
-              API: {process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8787'}
-            </p>
+            {isLocalDev && (
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                Dev: superadmin@chasehorse.com / Password123!
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

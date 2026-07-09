@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ThemeProvider } from '@/components/theme-provider';
+import { LeadFormProvider } from '@/components/lead-form-provider';
+import { SmoothScroll } from '@/components/motion/smooth-scroll';
+import { LeadFormModal } from '@/components/sections/lead-form-modal';
+import { SiteContentProvider } from '@/components/site-content-provider';
+import { getSiteContent } from '@/lib/content';
 import './globals.css';
 
 const geist = Geist({
@@ -21,7 +26,7 @@ export const metadata: Metadata = {
     template: '%s | ChaseHorse',
   },
   description:
-    'Growth Enabler Logiworkx Platform [GELP] — technology-driven logistics and supply chain transformation.',
+    'ChaseHorse — technology-driven logistics and supply chain transformation. Deploy faster. Deliver smarter.',
   openGraph: {
     siteName: 'ChaseHorse',
     type: 'website',
@@ -34,15 +39,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('ch-theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d)}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('ch-theme');document.documentElement.classList.toggle('dark',t==='dark')}catch(e){}})()`,
           }}
         />
       </head>
       <body className="font-sans">
         <ThemeProvider>
-          <SiteHeader />
-          <main>{children}</main>
-          <SiteFooter />
+          <SiteContentProvider initial={getSiteContent()}>
+            <LeadFormProvider>
+              <SmoothScroll>
+                <SiteHeader />
+                <main>{children}</main>
+                <SiteFooter />
+              </SmoothScroll>
+              <LeadFormModal />
+            </LeadFormProvider>
+          </SiteContentProvider>
         </ThemeProvider>
       </body>
     </html>

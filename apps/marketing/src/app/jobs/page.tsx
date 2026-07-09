@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/components/hero-section';
 import { JobListing } from '@/components/job-listing';
+import { PageSection } from '@/components/page-section';
+import { InnerCta } from '@/components/inner-cta';
 import { getSiteContent } from '@/lib/content';
+import { IMAGES } from '@/lib/images';
 
 export const metadata: Metadata = {
   title: 'Jobs',
@@ -15,19 +18,24 @@ export default function JobsPage() {
     <>
       <HeroSection
         title="Our Job Opportunities"
-        subtitle="Build great products to solve your business problems."
-        image="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
+        tagline="Careers"
+        subtitle="Join a team building the future of logistics technology."
+        image={IMAGES.jobs}
       />
-      <section className="bg-background py-24">
-        <div className="mx-auto max-w-4xl px-6">
-          <JobListing
-            title="On-Field Logiworkx Lead"
-            positions="10 open positions"
-            description={content.jobs.sections[0]?.body ?? ''}
-            location="PAN India — Chasehorse"
-          />
-        </div>
-      </section>
+      <PageSection variant="gray" reveal={false}>
+        <JobListing
+          title="On-Field Logiworkx Lead"
+          positions="10 open positions"
+          description={content.jobs.sections[0]?.body ?? ''}
+          location="PAN India — ChaseHorse"
+        />
+      </PageSection>
+      <InnerCta
+        title="Don't see the right role?"
+        description="Send us your profile — we're always looking for logistics talent."
+        href="/contact?subject=Job Application"
+        buttonLabel="Send Application"
+      />
     </>
   );
 }

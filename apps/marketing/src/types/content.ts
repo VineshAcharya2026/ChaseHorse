@@ -9,6 +9,53 @@ export interface ContentSection {
   image?: string;
 }
 
+export interface HeroSlideCta {
+  label: string;
+  action: 'quote' | 'link';
+  href?: string;
+}
+
+export interface HeroSlide {
+  id: string;
+  title: string;
+  subtitle: string;
+  image?: string;
+  primaryCta: HeroSlideCta;
+  secondaryCta: { label: string; href: string };
+}
+
+export interface HomeFeature {
+  title: string;
+  description: string;
+  statLabels: string[];
+  primaryCta: { label: string; action: 'quote' | 'link'; href?: string };
+  secondaryCta: { label: string; href: string };
+  image: string;
+}
+
+export interface InfoCard {
+  title: string;
+  description: string;
+  image: string;
+  ctas: { label: string; href: string; variant?: 'primary' | 'secondary' | 'dark' | 'outline'; action?: 'quote' | 'link' }[];
+}
+
+export interface ProductSlide {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  primaryCta: { label: string; action: 'quote' | 'link'; href?: string };
+  secondaryCta: { label: string; href: string };
+}
+
+export interface HomePageContent extends PageContent {
+  heroSlides: HeroSlide[];
+  feature: HomeFeature;
+  infoCards: InfoCard[];
+  secondarySlides: ProductSlide[];
+}
+
 export interface PageContent {
   slug: string;
   title: string;
@@ -43,11 +90,63 @@ export interface TierService {
 }
 
 export interface SiteContent {
-  home: PageContent;
+  home: HomePageContent;
   contact: PageContent;
   jobs: PageContent;
   services: TierService[];
   products: ProductContent[];
   courses: CourseContent[];
   pages: Record<string, PageContent>;
+  testimonials: Testimonial[];
+  clients: ClientLogo[];
+  faqs: FaqItem[];
+  servicePillars: ServicePillar[];
+  globalPresence: string[];
+  homepageStats: HomepageStat[];
+  networkStats: { value: string; label: string }[];
+  networkBullets: string[];
+  featuredServices: FeaturedService[];
+  insights: InsightArticle[];
+}
+
+export interface Testimonial {
+  name: string;
+  role: string;
+  company: string;
+  quote: string;
+}
+
+export interface ClientLogo {
+  name: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface ServicePillar {
+  title: string;
+  subtitle: string;
+  items: { title: string; slug: string; href: string }[];
+}
+
+export interface HomepageStat {
+  value: string;
+  label: string;
+  icon: 'globe' | 'package' | 'users' | 'warehouse' | 'headset';
+}
+
+export interface FeaturedService {
+  slug: string;
+  title: string;
+  description: string;
+  icon: 'truck' | 'ship' | 'plane' | 'warehouse' | 'file-check' | 'network';
+}
+
+export interface InsightArticle {
+  slug: string;
+  title: string;
+  date: string;
+  image: string;
 }

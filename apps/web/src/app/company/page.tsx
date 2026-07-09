@@ -36,7 +36,7 @@ function CompanyDashboardContent() {
         <KpiCard title="Failed Deliveries" value={kpis?.failedDeliveries ?? 0} icon={AlertTriangle} />
       </div>
       {data?.data?.deliveryTrend && (
-        <div className="mt-8 rounded-xl border border-white/10 p-6">
+        <div className="mt-8 rounded-xl border border-border p-6">
           <h3 className="mb-4 font-semibold">Weekly Deliveries</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.data.deliveryTrend}>

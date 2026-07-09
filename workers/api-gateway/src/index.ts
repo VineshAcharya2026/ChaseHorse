@@ -23,6 +23,10 @@ import {
   processWebhookDelivery,
 } from './routes/integrations';
 import { trackingRouter } from './routes/tracking';
+import { uploadsRouter } from './routes/uploads';
+import { cmsRouter } from './routes/cms';
+import { handleRazorpayWebhook } from './routes/billing';
+import { OPENAPI_SPEC } from './openapi';
 import { rateLimitMiddleware } from './middleware/auth';
 import { createDb, seedDatabase, users } from '@chasehorse/database';
 import type { Env } from './types';
@@ -64,7 +68,30 @@ app.use('/api/*', rateLimitMiddleware);
 
 app.get('/health', (c) => c.json({ status: 'ok', service: 'chasehorse-api', version: '1.0.0' }));
 
+app.get('/openapi.json', (c) => c.json(OPENAPI_SPEC));
+
+app.post('/webhooks/razorpay', async (c) => {
+  const body = await c.req.text();
+  const signature = c.req.header('X-Razorpay-Signature');
+  const result = await handleRazorpayWebhook(c.env, body, signature ?? null);
+  return c.json(result);
+});
+
 app.post('/admin/seed', async (c) => {
+  const isDev = c.env.JWT_SECRET.startsWith('dev-');
+  if (!isDev) {
+    const secret = c.req.header('X-Seed-Secret');
+    if (!c.env.SEED_SECRET || secret !== c.env.SEED_SECRET) {
+      return c.json({ success: false, error: 'Forbidden' }, 403);
+    }
+  }
+
+  const db = createDb(c.env.DB);
+  const existing = await db.select().from(users).limit(1).get();
+  if (existing) {
+    return c.json({ success: true, message: 'Database already seeded' });
+  }
+
   await seedDatabase(c.env.DB);
   return c.json({ success: true, message: 'Database seeded' });
 });
@@ -90,6 +117,18 @@ app.route('/api/api-keys', apiKeysRouter);
 app.route('/api/workflows', workflowsRouter);
 app.route('/api/support', supportRouter);
 app.route('/api/tracking', trackingRouter);
+app.route('/api/uploads', uploadsRouter);
+app.route('/api/cms', cmsRouter);
+app.get('/api/files/:key{.+}', async (c) => {
+  if (!c.env.STORAGE) return c.json({ success: false, error: 'Storage not configured' }, 503);
+  const key = decodeURIComponent(c.req.param('key'));
+  const object = await c.env.STORAGE.get(key);
+  if (!object) return c.json({ success: false, error: 'Not found' }, 404);
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set('Cache-Control', 'public, max-age=31536000');
+  return new Response(object.body, { headers });
+});
 
 app.post('/graphql', async (c) => {
   const body = await c.req.json<{ query: string }>();

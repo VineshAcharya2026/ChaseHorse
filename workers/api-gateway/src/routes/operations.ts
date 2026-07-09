@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { createDb, drivers, vehicles, customers } from '@chasehorse/database';
 import { generateId } from '../lib/auth';
 import { authMiddleware, requireRoles } from '../middleware/auth';
+import { audit } from '../lib/audit-helper';
 import type { Env, Variables } from '../types';
 
 const driversRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -43,6 +44,7 @@ driversRouter.post('/', requireRoles('super_admin', 'company_admin', 'branch_man
   });
 
   const driver = await db.select().from(drivers).where(eq(drivers.id, id)).get();
+  await audit(c, 'create', 'driver', id);
   return c.json({ success: true, data: driver }, 201);
 });
 

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
+    "deploy:cf": "wrangler pages deploy out --project-name=chasehorse-app",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
@@ -48,6 +49,7 @@
     "eslint-config-next": "^15.1.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "wrangler": "^3.99.0"
   }
 }

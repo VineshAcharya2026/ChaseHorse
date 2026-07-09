@@ -40,7 +40,7 @@ function SupportContent() {
     <div>
       <PageHeader title="Support Center" description="Tickets and chat support" />
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-white/10">
+        <Card className="border-border">
           <CardHeader><CardTitle>Create Ticket</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div><Label>Subject</Label><Input value={subject} onChange={(e) => setSubject(e.target.value)} /></div>
@@ -51,7 +51,7 @@ function SupportContent() {
         <div>
           <h3 className="mb-4 font-semibold">Your Tickets</h3>
           {(data?.data ?? []).map((ticket) => (
-            <div key={ticket.id as string} className="mb-3 rounded-lg border border-white/10 p-4">
+            <div key={ticket.id as string} className="mb-3 rounded-lg border border-border p-4">
               <p className="font-medium">{ticket.subject as string}</p>
               <p className="text-sm text-muted-foreground">{ticket.status as string} · {ticket.priority as string}</p>
             </div>

@@ -10,7 +10,7 @@ import {
   supportTickets,
   supportMessages,
 } from '@chasehorse/database';
-import { CONNECTOR_METADATA } from '@chasehorse/integrations-sdk';
+import { CONNECTOR_METADATA, createConnector } from '@chasehorse/integrations-sdk';
 import { generateApiKey, hashToken, verifyWebhookSignature } from '@chasehorse/core';
 import { generateId } from '../lib/auth';
 import { authMiddleware, requireRoles } from '../middleware/auth';
@@ -50,11 +50,31 @@ integrationsRouter.post('/', requireRoles('super_admin', 'company_admin'), async
 
 integrationsRouter.post('/:id/sync', requireRoles('super_admin', 'company_admin'), async (c) => {
   const db = createDb(c.env.DB);
+  const integration = await db.select().from(integrations).where(eq(integrations.id, c.req.param('id'))).get();
+  if (!integration) return c.json({ success: false, error: 'Not found' }, 404);
+
+  const config = integration.syncConfig ? (JSON.parse(integration.syncConfig) as Record<string, unknown>) : {};
+  if (integration.provider === 'zoho') {
+    config.clientId = c.env.ZOHO_CLIENT_ID;
+    config.clientSecret = c.env.ZOHO_CLIENT_SECRET;
+  }
+
+  const connector = createConnector(integration.provider, config);
+  let shipmentId = 'demo';
+  try {
+    const body = await c.req.json<{ shipmentId?: string }>();
+    shipmentId = body.shipmentId ?? 'demo';
+  } catch {
+    // optional body
+  }
+  const trackingUrl = `${c.env.FRONTEND_URL}/track?awb=demo`;
+  await connector.pushStatus(shipmentId, 'delivered', trackingUrl);
+
   await db
     .update(integrations)
     .set({ lastSyncAt: new Date().toISOString(), status: 'active', updatedAt: new Date().toISOString() })
     .where(eq(integrations.id, c.req.param('id')));
-  return c.json({ success: true, message: 'Sync initiated' });
+  return c.json({ success: true, message: 'Sync completed' });
 });
 
 const webhooksRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -69,6 +89,22 @@ webhooksRouter.get('/', async (c) => {
     .where(eq(webhookSubscriptions.companyId, companyId!))
     .all();
   return c.json({ success: true, data: items });
+});
+
+webhooksRouter.get('/deliveries', async (c) => {
+  const db = createDb(c.env.DB);
+  const companyId = c.req.query('companyId') ?? c.get('companyId');
+  const subs = await db
+    .select()
+    .from(webhookSubscriptions)
+    .where(eq(webhookSubscriptions.companyId, companyId!))
+    .all();
+  const subIds = subs.map((s) => s.id);
+  const items = subIds.length
+    ? await db.select().from(webhookDeliveries).all()
+    : [];
+  const filtered = items.filter((d) => subIds.includes(d.subscriptionId));
+  return c.json({ success: true, data: filtered.slice(0, 50) });
 });
 
 webhooksRouter.post('/', requireRoles('super_admin', 'company_admin', 'enterprise_user'), async (c) => {
@@ -168,10 +204,12 @@ apiRouter.use('/v1/*', async (c, next) => {
 
   const db = createDb(c.env.DB);
   const keyHash = await hashToken(apiKey);
-  const keys = await db.select().from(apiKeys).all();
-  const matched = keys.find((k) => k.keyHash === keyHash);
+  const matched = await db.select().from(apiKeys).where(eq(apiKeys.keyHash, keyHash)).get();
 
   if (!matched) return c.json({ success: false, error: 'Invalid API key' }, 401);
+  if (matched.expiresAt && new Date(matched.expiresAt) < new Date()) {
+    return c.json({ success: false, error: 'API key expired' }, 401);
+  }
 
   c.set('companyId', matched.companyId);
   c.set('userRole', 'enterprise_user');
@@ -269,7 +307,7 @@ export async function executeWorkflows(env: Env, event: string, companyId: strin
     if (!workflow.enabled || workflow.trigger !== event) continue;
     const steps = JSON.parse(workflow.steps) as Array<{ action: string; config: Record<string, unknown> }>;
     for (const step of steps) {
-      await env.NOTIFICATION_QUEUE.send({
+      await env.NOTIFICATION_QUEUE?.send({
         event: `workflow.${step.action}`,
         workflowId: workflow.id,
         config: step.config,

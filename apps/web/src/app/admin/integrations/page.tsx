@@ -29,7 +29,7 @@ function IntegrationsContent() {
       <PageHeader title="Integrations" description="CRM, ERP, and e-commerce connectors" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {providers.map(([key, provider]) => (
-          <div key={key} className="rounded-xl border border-white/10 p-6">
+          <div key={key} className="rounded-xl border border-border p-6">
             <span className="text-xs uppercase text-primary">{provider.category}</span>
             <h3 className="mt-1 font-semibold">{provider.name}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{provider.description}</p>

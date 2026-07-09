@@ -16,7 +16,10 @@ import 'reactflow/dist/style.css';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { PageHeader } from '@/components/dashboard/kpi-card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { api, useAuthStore } from '@chasehorse/auth-client';
+import { WEBHOOK_EVENTS } from '@chasehorse/shared';
 
 const initialNodes: Node[] = [
   { id: '1', position: { x: 250, y: 0 }, data: { label: 'New Order Created' }, type: 'input', style: { background: '#1a1a2e', color: '#fff', border: '1px solid #333' } },
@@ -45,6 +48,8 @@ export default function WorkflowsPage() {
 function WorkflowBuilder() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [name, setName] = useState('Order Fulfillment');
+  const [trigger, setTrigger] = useState('shipment.created');
   const { accessToken } = useAuthStore();
   api.setToken(accessToken);
 
@@ -59,8 +64,8 @@ function WorkflowBuilder() {
       .map((n) => ({ action: String(n.data.label).toLowerCase().replace(/ /g, '_'), config: {} }));
 
     await api.post('/api/workflows', {
-      name: 'Order Fulfillment',
-      trigger: 'order.created',
+      name,
+      trigger,
       steps,
       enabled: true,
     });
@@ -69,11 +74,30 @@ function WorkflowBuilder() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-end gap-4">
         <PageHeader title="Workflow Builder" description="No-code automation" />
-        <Button onClick={handleSave}>Save Workflow</Button>
+        <div className="ml-auto flex flex-wrap items-end gap-3">
+          <div>
+            <Label htmlFor="wf-name">Name</Label>
+            <Input id="wf-name" value={name} onChange={(e) => setName(e.target.value)} className="w-48" />
+          </div>
+          <div>
+            <Label htmlFor="wf-trigger">Trigger</Label>
+            <select
+              id="wf-trigger"
+              value={trigger}
+              onChange={(e) => setTrigger(e.target.value)}
+              className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+            >
+              {WEBHOOK_EVENTS.map((e) => (
+                <option key={e} value={e}>{e}</option>
+              ))}
+            </select>
+          </div>
+          <Button onClick={handleSave}>Save Workflow</Button>
+        </div>
       </div>
-      <div className="h-[600px] rounded-xl border border-white/10">
+      <div className="h-[600px] rounded-xl border border-border">
         <ReactFlow
           nodes={nodes}
           edges={edges}

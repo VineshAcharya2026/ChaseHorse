@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 import {
   createDb,
   shipments,
@@ -7,10 +7,21 @@ import {
   pickups,
   proofOfDelivery,
   drivers,
+  customers,
 } from '@chasehorse/database';
-import { canTransitionShipment, calculateShipmentPrice, generateAwbNumber } from '@chasehorse/core';
+import {
+  canTransitionShipment,
+  calculateShipmentPrice,
+  generateAwbNumber,
+  validatePickupSlot,
+  slotLabelForDate,
+} from '@chasehorse/core';
 import { generateId, hashPassword } from '../lib/auth';
 import { authMiddleware, requireRoles } from '../middleware/auth';
+import { enforceTenant } from '../lib/tenant-access';
+import { audit } from '../lib/audit-helper';
+import { uploadBase64Image } from '../lib/storage';
+import { executeWorkflows } from './integrations';
 import type { Env, Variables } from '../types';
 import type { ShipmentStatus } from '@chasehorse/shared';
 
@@ -38,10 +49,17 @@ shipmentsRouter.get('/track/:awb', async (c) => {
     driver = await db.select().from(drivers).where(eq(drivers.id, shipment.driverId)).get();
   }
 
+  const pod = await db
+    .select()
+    .from(proofOfDelivery)
+    .where(eq(proofOfDelivery.shipmentId, shipment.id))
+    .get();
+
   return c.json({
     success: true,
     data: {
       shipment: {
+        id: shipment.id,
         awbNumber: shipment.awbNumber,
         status: shipment.status,
         type: shipment.type,
@@ -51,6 +69,9 @@ shipmentsRouter.get('/track/:awb', async (c) => {
       },
       events,
       driver: driver ? { name: driver.name, phone: driver.phone } : null,
+      pod: pod
+        ? { method: pod.method, signatureUrl: pod.signatureUrl, photoUrl: pod.photoUrl }
+        : null,
     },
   });
 });
@@ -60,6 +81,31 @@ shipmentsRouter.use('*', authMiddleware);
 shipmentsRouter.get('/', async (c) => {
   const db = createDb(c.env.DB);
   const companyId = c.req.query('companyId') ?? c.get('companyId');
+  const driverId = c.req.query('driverId');
+  const customerId = c.req.query('customerId');
+
+  if (driverId) {
+    const items = await db
+      .select()
+      .from(shipments)
+      .where(eq(shipments.driverId, driverId))
+      .orderBy(desc(shipments.createdAt))
+      .limit(50)
+      .all();
+    return c.json({ success: true, data: items });
+  }
+
+  if (customerId && companyId) {
+    const items = await db
+      .select()
+      .from(shipments)
+      .where(and(eq(shipments.companyId, companyId), eq(shipments.customerId, customerId)))
+      .orderBy(desc(shipments.createdAt))
+      .limit(50)
+      .all();
+    return c.json({ success: true, data: items });
+  }
+
   if (!companyId) return c.json({ success: false, error: 'companyId required' }, 400);
 
   const items = await db
@@ -78,6 +124,12 @@ shipmentsRouter.get('/:id', async (c) => {
   const shipment = await db.select().from(shipments).where(eq(shipments.id, c.req.param('id'))).get();
   if (!shipment) return c.json({ success: false, error: 'Not found' }, 404);
 
+  try {
+    enforceTenant(c, shipment.companyId, shipment.branchId);
+  } catch {
+    return c.json({ success: false, error: 'Forbidden' }, 403);
+  }
+
   const events = await db
     .select()
     .from(shipmentEvents)
@@ -93,11 +145,14 @@ shipmentsRouter.post('/', async (c) => {
   const db = createDb(c.env.DB);
   const id = generateId();
   const companyId = body.companyId ?? c.get('companyId');
+  if (!companyId) return c.json({ success: false, error: 'companyId required' }, 400);
+
   const pricing = calculateShipmentPrice(body.type, body.weight);
+  const awbPrefix = c.env.AWB_PREFIX ?? 'CH';
 
   await db.insert(shipments).values({
     id,
-    awbNumber: generateAwbNumber(),
+    awbNumber: generateAwbNumber(awbPrefix),
     companyId,
     branchId: body.branchId,
     customerId: body.customerId,
@@ -123,11 +178,15 @@ shipmentsRouter.post('/', async (c) => {
     notes: 'Shipment created',
   });
 
-  await c.env.NOTIFICATION_QUEUE.send({
+  await c.env.NOTIFICATION_QUEUE?.send({
     event: 'shipment.created',
     shipmentId: id,
     companyId,
+    awb: (await db.select().from(shipments).where(eq(shipments.id, id)).get())?.awbNumber,
   });
+  await c.env.WEBHOOK_QUEUE?.send({ event: 'shipment.created', shipmentId: id, companyId });
+  await executeWorkflows(c.env, 'shipment.created', companyId, { shipmentId: id });
+  await audit(c, 'create', 'shipment', id);
 
   const shipment = await db.select().from(shipments).where(eq(shipments.id, id)).get();
   return c.json({ success: true, data: shipment }, 201);
@@ -167,7 +226,15 @@ shipmentsRouter.patch('/:id/status', async (c) => {
     longitude,
   });
 
-  await c.env.WEBHOOK_QUEUE.send({ event: `shipment.${status}`, shipmentId, companyId: shipment.companyId });
+  await c.env.WEBHOOK_QUEUE?.send({ event: `shipment.${status}`, shipmentId, companyId: shipment.companyId });
+  await c.env.NOTIFICATION_QUEUE?.send({
+    event: `shipment.${status}`,
+    shipmentId,
+    companyId: shipment.companyId,
+    awb: shipment.awbNumber,
+  });
+  await executeWorkflows(c.env, `shipment.${status}`, shipment.companyId, { shipmentId, status });
+  await audit(c, 'update_status', 'shipment', shipmentId, { status });
 
   return c.json({ success: true, message: 'Status updated' });
 });
@@ -176,6 +243,13 @@ shipmentsRouter.post('/:id/assign', requireRoles('super_admin', 'company_admin',
   const { driverId } = await c.req.json<{ driverId: string }>();
   const db = createDb(c.env.DB);
   const shipmentId = c.req.param('id');
+
+  const shipment = await db.select().from(shipments).where(eq(shipments.id, shipmentId)).get();
+  if (!shipment) return c.json({ success: false, error: 'Not found' }, 404);
+
+  if (!canTransitionShipment(shipment.status as ShipmentStatus, 'assigned')) {
+    return c.json({ success: false, error: 'Cannot assign shipment in current status' }, 400);
+  }
 
   await db
     .update(shipments)
@@ -190,6 +264,10 @@ shipmentsRouter.post('/:id/assign', requireRoles('super_admin', 'company_admin',
     notes: `Assigned to driver ${driverId}`,
   });
 
+  const stub = c.env.TRACKING.get(c.env.TRACKING.idFromName(shipmentId));
+  await stub.fetch(new Request('https://internal/init', { method: 'POST' }));
+
+  await audit(c, 'assign', 'shipment', shipmentId, { driverId });
   return c.json({ success: true, message: 'Driver assigned' });
 });
 
@@ -209,6 +287,9 @@ pickupsRouter.post('/', async (c) => {
   const id = generateId();
   const companyId = body.companyId ?? c.get('companyId');
 
+  const slotCheck = validatePickupSlot(body.scheduledAt);
+  if (!slotCheck.valid) return c.json({ success: false, error: slotCheck.error }, 400);
+
   await db.insert(pickups).values({
     id,
     companyId,
@@ -220,7 +301,14 @@ pickupsRouter.post('/', async (c) => {
     instant: body.instant ?? false,
   });
 
-  await c.env.NOTIFICATION_QUEUE.send({ event: 'pickup.scheduled', pickupId: id, companyId });
+  await c.env.NOTIFICATION_QUEUE?.send({
+    event: 'pickup.scheduled',
+    pickupId: id,
+    companyId,
+    slot: slotLabelForDate(body.scheduledAt),
+  });
+  await audit(c, 'create', 'pickup', id);
+
   const pickup = await db.select().from(pickups).where(eq(pickups.id, id)).get();
   return c.json({ success: true, data: pickup }, 201);
 });
@@ -232,6 +320,7 @@ pickupsRouter.patch('/:id/assign', requireRoles('super_admin', 'company_admin', 
     .update(pickups)
     .set({ driverId, status: 'assigned', updatedAt: new Date().toISOString() })
     .where(eq(pickups.id, c.req.param('id')));
+  await audit(c, 'assign', 'pickup', c.req.param('id'), { driverId });
   return c.json({ success: true, message: 'Pickup assigned' });
 });
 
@@ -243,6 +332,23 @@ podRouter.post('/', requireRoles('driver', 'branch_manager', 'company_admin'), a
   const db = createDb(c.env.DB);
   const id = generateId();
 
+  const shipment = await db.select().from(shipments).where(eq(shipments.id, body.shipmentId)).get();
+  if (!shipment) return c.json({ success: false, error: 'Shipment not found' }, 404);
+
+  let signatureUrl = body.signatureData;
+  let photoUrl = body.photoUrl;
+
+  if (body.signatureData?.startsWith('data:')) {
+    const key = `pod/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${shipment.awbNumber}-sig.png`;
+    await uploadBase64Image(c.env.STORAGE, key, body.signatureData);
+    signatureUrl = key;
+  }
+  if (body.photoData?.startsWith('data:')) {
+    const key = `pod/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${shipment.awbNumber}-photo.png`;
+    await uploadBase64Image(c.env.STORAGE, key, body.photoData);
+    photoUrl = key;
+  }
+
   let otpHash = null;
   if (body.method === 'otp' && body.otp) {
     otpHash = await hashPassword(body.otp);
@@ -253,26 +359,41 @@ podRouter.post('/', requireRoles('driver', 'branch_manager', 'company_admin'), a
     shipmentId: body.shipmentId,
     method: body.method,
     otpHash,
-    signatureUrl: body.signatureData,
-    photoUrl: body.photoUrl,
+    signatureUrl,
+    photoUrl,
     qrCode: body.qrCode,
     barcode: body.barcode,
     deliveredBy: c.get('userId'),
   });
 
-  await db
-    .update(shipments)
-    .set({ status: 'delivered', deliveredAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
-    .where(eq(shipments.id, body.shipmentId));
+  if (canTransitionShipment(shipment.status as ShipmentStatus, 'delivered')) {
+    await db
+      .update(shipments)
+      .set({ status: 'delivered', deliveredAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+      .where(eq(shipments.id, body.shipmentId));
 
-  await db.insert(shipmentEvents).values({
-    id: generateId(),
-    shipmentId: body.shipmentId,
-    status: 'delivered',
-    actorId: c.get('userId'),
-    notes: `POD via ${body.method}`,
-  });
+    await db.insert(shipmentEvents).values({
+      id: generateId(),
+      shipmentId: body.shipmentId,
+      status: 'delivered',
+      actorId: c.get('userId'),
+      notes: `POD via ${body.method}`,
+    });
 
+    await c.env.WEBHOOK_QUEUE?.send({
+      event: 'shipment.delivered',
+      shipmentId: body.shipmentId,
+      companyId: shipment.companyId,
+    });
+    await c.env.NOTIFICATION_QUEUE?.send({
+      event: 'shipment.delivered',
+      shipmentId: body.shipmentId,
+      companyId: shipment.companyId,
+      awb: shipment.awbNumber,
+    });
+  }
+
+  await audit(c, 'create', 'pod', id, { shipmentId: body.shipmentId });
   return c.json({ success: true, message: 'Delivery confirmed' }, 201);
 });
 

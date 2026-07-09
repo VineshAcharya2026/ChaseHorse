@@ -34,7 +34,7 @@ function AdminAnalyticsContent() {
         <KpiCard title="Success Rate" value={`${data?.data?.kpis?.successRate ?? 0}%`} icon={AlertTriangle} />
       </div>
       {data?.data?.deliveryTrend && (
-        <div className="mt-8 rounded-xl border border-white/10 p-6">
+        <div className="mt-8 rounded-xl border border-border p-6">
           <h3 className="mb-4 font-semibold">Delivery Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.data.deliveryTrend}>

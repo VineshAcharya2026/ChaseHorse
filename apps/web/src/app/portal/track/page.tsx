@@ -16,7 +16,7 @@ export default function PortalTrackPage() {
         <PageHeader title="Track Parcel" />
         <div className="mx-auto max-w-md space-y-4">
           <div><Label>AWB Number</Label><Input value={awb} onChange={(e) => setAwb(e.target.value)} /></div>
-          <Button className="w-full" asChild><a href={awb ? `/track/${awb}` : '#'}>Track</a></Button>
+          <Button className="w-full" asChild><a href={awb ? `/track?awb=${encodeURIComponent(awb)}` : '#'}>Track</a></Button>
         </div>
       </div>
     </AuthGuard>

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/components/hero-section';
 import { ProductShowcase } from '@/components/product-showcase';
+import { PageSection } from '@/components/page-section';
+import { InnerCta } from '@/components/inner-cta';
 import { getSiteContent } from '@/lib/content';
+import { IMAGES } from '@/lib/images';
 
 export const metadata: Metadata = {
   title: 'Merchandise',
@@ -15,14 +18,18 @@ export default function MerchandisePage() {
     <>
       <HeroSection
         title="Merchandise"
+        tagline="Official Store"
         subtitle="Official ChaseHorse apparel and branded gear."
-        image="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80"
+        image={IMAGES.shop}
       />
-      <section className="bg-background py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <ProductShowcase products={products} />
-        </div>
-      </section>
+      <PageSection variant="white" title="Shop Collection" subtitle="ChaseHorse Gear" reveal={false}>
+        <ProductShowcase products={products} />
+      </PageSection>
+      <InnerCta
+        title="Bulk orders for your team?"
+        href="/contact?subject=Merchandise Bulk Order"
+        buttonLabel="Enquire Now"
+      />
     </>
   );
 }

@@ -4,31 +4,13 @@
 
 @layer base {
   :root {
-    --background: 255 255 255;
-    --foreground: 23 23 23;
-    --muted: 115 115 115;
-    --border: 229 229 229;
-    --surface: 245 245 245;
-    --header-bg: 255 255 255;
-    --header-fg: 23 23 23;
-    --card-bg: 255 255 255;
-    --btn-primary-bg: 23 23 23;
-    --btn-primary-fg: 255 255 255;
-    --btn-secondary-border: 23 23 23;
-  }
-
-  .dark {
-    --background: 0 0 0;
-    --foreground: 255 255 255;
-    --muted: 163 163 163;
-    --border: 38 38 38;
-    --surface: 10 10 10;
-    --header-bg: 0 0 0;
-    --header-fg: 255 255 255;
-    --card-bg: 10 10 10;
-    --btn-primary-bg: 255 255 255;
-    --btn-primary-fg: 0 0 0;
-    --btn-secondary-border: 255 255 255;
+    --background: 252 248 242;
+    --foreground: 23 26 32;
+    --muted: 92 94 98;
+    --border: 232 224 212;
+    --surface: 245 240 232;
+    --brand: 61 106 229;
+    --accent: 61 106 229;
   }
 
   html {
@@ -40,12 +22,109 @@
     color: rgb(var(--foreground));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background-color: rgb(var(--brand) / 0.15);
+    color: rgb(var(--foreground));
+  }
+}
+
+@layer components {
+  .card-elevated {
+    @apply rounded-md border border-tesla-gray bg-white transition duration-500 hover:shadow-md;
+  }
+
+  .btn-brand {
+    @apply inline-flex items-center justify-center rounded-sm bg-tesla-blue px-8 py-3 text-sm font-medium text-white transition hover:bg-tesla-blue/90;
+  }
+
+  .input-line {
+    @apply w-full rounded-sm border border-tesla-gray bg-white px-4 py-3 text-tesla-black outline-none transition placeholder:text-tesla-muted focus:border-tesla-blue focus:ring-1 focus:ring-tesla-blue/30;
+  }
+
+  .btn-tesla-primary {
+    @apply inline-flex h-10 min-w-[256px] max-w-[480px] flex-1 items-center justify-center rounded-[4px] bg-[#3e6ae1] px-6 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#3457b1] sm:flex-none;
+  }
+
+  .btn-tesla-secondary {
+    @apply inline-flex h-10 min-w-[256px] max-w-[480px] flex-1 items-center justify-center rounded-[4px] bg-white/65 px-6 text-[14px] font-medium text-tesla-black backdrop-blur-sm transition-colors duration-200 hover:bg-white/80 sm:flex-none;
+  }
+
+  .btn-tesla-secondary-dark {
+    @apply inline-flex h-10 min-w-[256px] max-w-[480px] flex-1 items-center justify-center rounded-[4px] border border-tesla-black/30 bg-white px-6 text-[14px] font-medium text-tesla-black transition-colors duration-200 hover:bg-tesla-gray sm:flex-none;
+  }
+
+  .btn-tesla-dark {
+    @apply inline-flex h-10 min-w-[256px] max-w-[480px] flex-1 items-center justify-center rounded-[4px] bg-tesla-black px-6 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#393c41] sm:flex-none;
+  }
+
+  .btn-tesla-outline {
+    @apply inline-flex h-10 min-w-[256px] max-w-[480px] flex-1 items-center justify-center rounded-[4px] border border-tesla-black/30 bg-white px-6 text-[14px] font-medium text-tesla-black transition-colors duration-200 hover:bg-tesla-gray sm:flex-none;
+  }
+
+  .tesla-cta-row {
+    @apply flex w-full max-w-[640px] flex-col items-center gap-5 sm:flex-row sm:justify-center;
+  }
+
+  .tesla-hero-title {
+    @apply text-[40px] font-medium leading-[1.1] tracking-[-0.01em] text-tesla-black;
+  }
+
+  .tesla-hero-subtitle {
+    @apply mt-1 text-[17px] font-normal leading-snug text-tesla-muted;
+  }
+
+  .product-frame {
+    @apply overflow-hidden rounded-[6px] border border-tesla-frameBorder bg-tesla-frame shadow-sm;
+  }
+
+  .tesla-section-snap {
+    @apply relative h-[100svh] min-h-[100svh] w-full snap-start snap-always scroll-mt-20;
+  }
+
+  .tesla-home-scroll {
+    @apply snap-y snap-mandatory;
+  }
+
+  .tesla-page-title {
+    @apply text-3xl font-medium tracking-tight text-tesla-black md:text-[40px];
+  }
+
+  .tesla-section-title {
+    @apply text-2xl font-medium tracking-tight text-tesla-black md:text-[32px];
+  }
+
+  .tesla-body {
+    @apply text-[15px] leading-relaxed text-tesla-body;
+  }
+
+  .tesla-card {
+    @apply rounded-md bg-tesla-gray transition duration-500 hover:shadow-lg;
+  }
+
+  .tesla-link {
+    @apply text-[14px] font-medium text-tesla-blue transition hover:text-tesla-blue/80;
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
   }
 }

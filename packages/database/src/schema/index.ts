@@ -418,3 +418,36 @@ export const driverLocations = sqliteTable('driver_locations', {
     .notNull()
     .default(sql`(datetime('now'))`),
 });
+
+export const cmsAssets = sqliteTable('cms_assets', {
+  id: text('id').primaryKey(),
+  key: text('key').notNull(),
+  url: text('url').notNull(),
+  folder: text('folder').notNull().default('images'),
+  mimeType: text('mime_type').notNull(),
+  filename: text('filename').notNull(),
+  altText: text('alt_text'),
+  sizeBytes: integer('size_bytes').default(0),
+  uploadedBy: text('uploaded_by'),
+  ...timestamps,
+});
+
+export const cmsContent = sqliteTable('cms_content', {
+  id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  payload: text('payload').notNull(),
+  version: integer('version').notNull().default(1),
+  updatedBy: text('updated_by'),
+  ...timestamps,
+});
+
+export const cmsRevisions = sqliteTable('cms_revisions', {
+  id: text('id').primaryKey(),
+  slug: text('slug').notNull(),
+  payload: text('payload').notNull(),
+  version: integer('version').notNull(),
+  updatedBy: text('updated_by'),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});

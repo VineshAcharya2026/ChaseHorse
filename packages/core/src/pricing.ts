@@ -23,8 +23,7 @@ export function canTransitionShipment(
   return allowed.includes(newStatus);
 }
 
-export function generateAwbNumber(): string {
-  const prefix = 'CH';
+export function generateAwbNumber(prefix = 'CH'): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `${prefix}${timestamp}${random}`;

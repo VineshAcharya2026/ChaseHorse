@@ -7,6 +7,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'chasehorse.odoo.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'videos.pexels.com' },
     ],
   },
 };

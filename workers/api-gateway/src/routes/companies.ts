@@ -3,6 +3,7 @@ import { eq, desc, sql } from 'drizzle-orm';
 import { createDb, companies, branches } from '@chasehorse/database';
 import { generateId } from '../lib/auth';
 import { authMiddleware, requireRoles } from '../middleware/auth';
+import { audit } from '../lib/audit-helper';
 import type { Env, Variables } from '../types';
 
 const companiesRouter = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -64,6 +65,7 @@ companiesRouter.post('/', requireRoles('super_admin'), async (c) => {
   });
 
   const company = await db.select().from(companies).where(eq(companies.id, id)).get();
+  await audit(c, 'create', 'company', id);
   return c.json({ success: true, data: company }, 201);
 });
 
@@ -83,6 +85,7 @@ companiesRouter.put('/:id', async (c) => {
     .where(eq(companies.id, id));
 
   const company = await db.select().from(companies).where(eq(companies.id, id)).get();
+  await audit(c, 'update', 'company', id);
   return c.json({ success: true, data: company });
 });
 

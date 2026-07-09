@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { AuthGuard } from '@/components/auth/auth-guard';
-import { KpiCard, PageHeader } from '@/components/dashboard/kpi-card';
+import { KpiCard, PageHeader, EmptyState } from '@/components/dashboard/kpi-card';
 import { api, useAuthStore } from '@chasehorse/auth-client';
 import { Building2, Users, Package, TrendingUp } from 'lucide-react';
 import {
@@ -27,7 +27,7 @@ function AdminDashboardContent() {
   const { accessToken } = useAuthStore();
   api.setToken(accessToken);
 
-  const { data } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['admin-analytics'],
     queryFn: () => api.get<{ success: boolean; data: { kpis: Record<string, number>; revenueTrend: { month: string; revenue: number }[] } }>('/api/analytics/super-admin'),
   });
@@ -37,16 +37,26 @@ function AdminDashboardContent() {
   return (
     <div>
       <PageHeader title="Super Admin Dashboard" description="Platform-wide overview" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard title="Revenue" value={`₹${(kpis?.revenue ?? 0).toLocaleString()}`} icon={TrendingUp} />
-        <KpiCard title="Companies" value={kpis?.companies ?? 0} icon={Building2} />
-        <KpiCard title="Drivers" value={kpis?.drivers ?? 0} icon={Users} />
-        <KpiCard title="Deliveries" value={kpis?.deliveries ?? 0} change={`${kpis?.successRate ?? 0}% success`} icon={Package} />
-      </div>
+      {isLoading ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-lg border border-border bg-muted/30" />
+          ))}
+        </div>
+      ) : isError ? (
+        <EmptyState title="Unable to load analytics" description="Check your connection and try again." />
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard title="Revenue" value={`₹${(kpis?.revenue ?? 0).toLocaleString()}`} icon={TrendingUp} />
+          <KpiCard title="Companies" value={kpis?.companies ?? 0} icon={Building2} />
+          <KpiCard title="Drivers" value={kpis?.drivers ?? 0} icon={Users} />
+          <KpiCard title="Deliveries" value={kpis?.deliveries ?? 0} change={`${kpis?.successRate ?? 0}% success`} icon={Package} />
+        </div>
+      )}
       {data?.data?.revenueTrend && (
-        <div className="mt-8 rounded-xl border border-white/10 p-6">
-          <h3 className="mb-4 font-semibold">Revenue Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="mt-6 rounded-lg border border-border p-4">
+          <h3 className="mb-3 text-sm font-semibold">Revenue Trend</h3>
+          <ResponsiveContainer width="100%" height={240}>
             <LineChart data={data.data.revenueTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="month" stroke="#888" />

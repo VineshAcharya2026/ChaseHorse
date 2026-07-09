@@ -1,17 +1,17 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { cn } from '@/lib/utils';
 import { IMAGES } from '@/lib/images';
+import { ProductFrame } from '@/components/ui/product-frame';
+import { TeslaButton } from '@/components/ui/tesla-button';
 
 interface HeroSectionProps {
   title: string;
   subtitle?: string;
   tagline?: string;
   image?: string;
-  dark?: boolean;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   className?: string;
@@ -21,75 +21,52 @@ interface HeroSectionProps {
 export function HeroSection({
   title,
   subtitle,
-  tagline,
   image,
-  dark = true,
   primaryCta,
   secondaryCta,
   className,
   children,
 }: HeroSectionProps) {
-  const [imgError, setImgError] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const bgImage = image ?? IMAGES.hero;
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 });
+  }, []);
 
   return (
     <section
       className={cn(
-        'relative flex min-h-screen flex-col items-center justify-center overflow-hidden',
+        'relative overflow-hidden bg-tesla-cream pt-24 sm:pt-28',
         className,
       )}
     >
-      {!imgError && (
-        <Image
-          src={bgImage}
-          alt=""
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-          onError={() => setImgError(true)}
-        />
-      )}
-      {imgError && <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 to-black" />}
       <div
-        className={cn(
-          'absolute inset-0',
-          dark ? 'bg-black/50' : 'bg-white/60',
-        )}
-      />
-      <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
-        {tagline && (
-          <p className="mb-4 text-sm font-medium uppercase tracking-[0.3em] text-white/80">
-            {tagline}
-          </p>
-        )}
-        <h1 className="text-balance text-5xl font-medium tracking-tight text-white md:text-7xl">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80 md:text-xl">{subtitle}</p>
-        )}
+        ref={contentRef}
+        className="mx-auto w-full max-w-[1100px] px-6 pb-12 text-center"
+      >
+        <h1 className="tesla-hero-title">{title}</h1>
+        {subtitle && <p className="mx-auto mt-3 max-w-2xl tesla-hero-subtitle">{subtitle}</p>}
         {children}
         {(primaryCta || secondaryCta) && (
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             {primaryCta && (
-              <Link
-                href={primaryCta.href}
-                className="min-w-[200px] rounded-sm bg-white px-8 py-3 text-sm font-medium text-black transition hover:bg-white/90"
-              >
-                {primaryCta.label}
-              </Link>
+              <TeslaButton label={primaryCta.label} variant="primary" href={primaryCta.href} />
             )}
             {secondaryCta && (
-              <Link
-                href={secondaryCta.href}
-                className="min-w-[200px] rounded-sm border border-white/80 bg-black/30 px-8 py-3 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/10"
-              >
-                {secondaryCta.label}
-              </Link>
+              <TeslaButton label={secondaryCta.label} variant="secondary-dark" href={secondaryCta.href} />
             )}
           </div>
         )}
+        <ProductFrame
+          src={bgImage}
+          alt={title}
+          aspect="wide"
+          priority
+          className="mt-10"
+        />
       </div>
     </section>
   );

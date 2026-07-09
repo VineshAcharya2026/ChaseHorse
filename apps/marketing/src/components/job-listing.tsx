@@ -1,5 +1,9 @@
+'use client';
+
 import Link from 'next/link';
-import { ScrollReveal } from './scroll-reveal';
+import { MapPin } from 'lucide-react';
+import { GsapReveal } from '@/components/motion/gsap-reveal';
+import { TeslaButton } from '@/components/ui/tesla-button';
 
 interface JobListingProps {
   title: string;
@@ -10,23 +14,31 @@ interface JobListingProps {
 
 export function JobListing({ title, positions, description, location }: JobListingProps) {
   return (
-    <ScrollReveal>
-      <div className="border border-border bg-background p-8 md:p-12">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-medium text-foreground">{title}</h2>
-            <p className="mt-2 text-brand">{positions}</p>
+    <GsapReveal>
+      <article className="overflow-hidden rounded-md bg-tesla-gray">
+        <div className="border-b border-white/50 px-8 py-8 md:px-10">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div>
+              <p className="text-sm font-medium text-tesla-muted">Open Role</p>
+              <h2 className="mt-2 text-2xl font-medium text-tesla-black md:text-3xl">{title}</h2>
+              <p className="mt-2 text-sm text-tesla-blue">{positions}</p>
+            </div>
+            <TeslaButton
+              label="Apply Now"
+              variant="dark"
+              href="/contact?subject=Job Application"
+              className="min-w-0 shrink-0"
+            />
           </div>
-          <Link
-            href="/contact?subject=Job Application"
-            className="rounded-sm bg-foreground px-6 py-2 text-sm font-medium text-background hover:opacity-90"
-          >
-            Apply Now
-          </Link>
         </div>
-        <p className="mt-6 text-lg leading-relaxed text-muted">{description}</p>
-        <p className="mt-4 text-sm text-muted">{location}</p>
-      </div>
-    </ScrollReveal>
+        <div className="px-8 py-8 md:px-10">
+          <p className="text-[15px] leading-relaxed text-tesla-body">{description}</p>
+          <p className="mt-6 flex items-center gap-2 text-sm text-tesla-body">
+            <MapPin className="h-4 w-4 text-tesla-muted" />
+            {location}
+          </p>
+        </div>
+      </article>
+    </GsapReveal>
   );
 }

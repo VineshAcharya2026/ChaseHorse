@@ -14,7 +14,7 @@ export default function EnterpriseReportsPage() {
     <AuthGuard allowedRoles={['enterprise_user']}>
       <div>
         <PageHeader title="Reports" description="Enterprise shipment analytics" />
-        <div className="rounded-xl border border-white/10 p-6">
+        <div className="rounded-xl border border-border p-6">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
