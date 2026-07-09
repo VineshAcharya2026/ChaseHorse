@@ -16,9 +16,10 @@ database_id = "42bd8654-a2dd-486a-8dd6-2aff2ba1785b"
 binding = "CACHE"
 id = "3fe761276dee4386ba37e8cd97b3d7b2"
 
-[[r2_buckets]]
-binding = "STORAGE"
-bucket_name = "chasehorse-storage"
+# Enable R2 in Cloudflare Dashboard, create chasehorse-storage, then uncomment:
+# [[r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "chasehorse-storage"
 
 # Queues - enable Queues in Cloudflare dashboard then uncomment
 # [[queues.producers]]
